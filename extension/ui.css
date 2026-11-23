@@ -37,6 +37,9 @@ h3 { font-size:13px; font-weight:600; color:var(--muted); margin:0 0 4px 2px; }
 .now span { flex:1; }
 .now .btn { min-height:40px; padding:0 14px; }
 .small { color:var(--muted); font-size:12.5px; margin:10px 0 0; }
+.small a { color:var(--accent); font-weight:600; }
+.pdfcard { margin-top:12px; padding:8px 8px 8px 12px; border-radius:12px; background:var(--soft); border:1px solid var(--accent);
+           display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:600; }
 
 /* welcome page */
 body.welcome { padding:48px 24px; font-size:19px; line-height:1.55; }

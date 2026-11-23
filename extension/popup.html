@@ -11,6 +11,10 @@
     <h1>Phonomenal</h1>
   </header>
   <p class="how">Select text on a page, <b>right-click</b>, then choose <b>Read aloud</b>.</p>
+  <section class="pdfcard" id="pdfCard" hidden>
+    <span>This tab is a PDF</span>
+    <button class="btn primary" id="readPdf" type="button">Read this PDF</button>
+  </section>
 
   <fieldset>
     <legend>Voice</legend>
@@ -35,6 +39,7 @@
     </div>
   </div>
   <p class="small" id="shortcut" hidden></p>
+  <p class="small"><a href="#" id="openPdf">Open a PDF from your computer…</a></p>
   <script type="module" src="popup.js"></script>
 </body>
 </html>

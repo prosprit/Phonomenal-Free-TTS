@@ -30,6 +30,13 @@ async function toPlayer(msg) {
   return inlinePlayer(msg);
 }
 
+// ---------- PDFs: open them in the Phonomenal reader (the browser's own PDF viewer cannot be scripted) ----------
+const PDF_PATTERNS = ["*://*/*.pdf", "*://*/*.pdf?*", "*://*/*.pdf#*", "*://*/*.PDF", "file:///*.pdf", "file:///*.PDF"];
+export function isPdfUrl(u) { try { return /\.pdf$/i.test(new URL(u).pathname); } catch { return false; } }
+const readerUrl = (file, find = "") =>
+  chrome.runtime.getURL("reader.html") + "?file=" + encodeURIComponent(file) + (find ? "&find=" + encodeURIComponent(find.slice(0, 300)) : "");
+export function openReader(tab, find = "") { return chrome.tabs.update(tab.id, { url: readerUrl(tab.url, find) }); }
+
 function setMenus(reading) {
   chrome.contextMenus.update("read-aloud", { title: reading ? "Read aloud (start over)" : "Read aloud" }).catch(() => {});
   chrome.contextMenus.update("stop-reading", { visible: reading }).catch(() => {});
@@ -123,6 +130,8 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({ id: "read-aloud", title: "Read aloud", contexts: ["selection"] });
     chrome.contextMenus.create({ id: "stop-reading", title: "Stop reading", contexts: ["all"], visible: false });
+    chrome.contextMenus.create({ id: "pdf-from-here", title: "Read aloud from here to the end", contexts: ["selection"], documentUrlPatterns: PDF_PATTERNS });
+    chrome.contextMenus.create({ id: "pdf-open", title: "Read this PDF aloud", contexts: ["page", "frame"], documentUrlPatterns: PDF_PATTERNS });
   });
   if (reason === "install") chrome.tabs.create({ url: "welcome.html" });
 });
@@ -130,6 +139,8 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "read-aloud") readText(info.selectionText, tab?.id);
   if (info.menuItemId === "stop-reading") stopReading();
+  if (info.menuItemId === "pdf-from-here" && tab) openReader({ ...tab, url: info.pageUrl || tab.url }, info.selectionText);
+  if (info.menuItemId === "pdf-open" && tab) openReader({ ...tab, url: info.pageUrl || tab.url });
 });
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
@@ -139,7 +150,8 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   try {
     const [{ result }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => String(getSelection() || "") });
     if (result.trim()) readText(result, tab.id);
-  } catch { /* page does not allow scripts */ }
+    else if (isPdfUrl(tab.url)) openReader(tab);      // on a PDF with nothing selected: open the reader
+  } catch { if (isPdfUrl(tab.url)) openReader(tab); /* page does not allow scripts */ }
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -150,11 +162,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "resume" && session && !session.usingFallback) toPlayer({ type: "resume" });
     if (msg.action === "read") readText(msg.text, msg.tabId ?? sender.tab?.id ?? null);
     if (msg.action === "warm") settings().then((s) => toPlayer({ type: "warm", speed: s.speed }));
+    if (msg.action === "open-pdf" && msg.url) {
+      if (msg.newTab) chrome.tabs.create({ url: readerUrl(msg.url, msg.find) });
+      else openReader({ id: msg.tabId ?? sender.tab?.id, url: msg.url }, msg.find);
+    }
+    // the PDF reader runs its own voice: stop this one and, in Chrome, free its memory
+    if (msg.action === "release") { if (session) stopReading(); if (USE_OFFSCREEN) chrome.offscreen.closeDocument().catch(() => {}); }
     sendResponse({ ok: true });
     return;
   }
   // The pill pings while reading: in Firefox each message keeps the event page from idling out mid-sentence.
   if (msg?.type === "keepalive") { sendResponse({ reading: !!session }); return; }
+  if (msg?.type === "reader-state") {        // the PDF reader's progress: badge + diagnostics
+    log.push({ t: Date.now(), state: "reader-" + msg.state, text: msg.text, highlighted: msg.highlighted }); if (log.length > 200) log.shift();
+    if (!session) setBadge(msg.state === "playing" ? "speaking" : msg.state);
+    return;
+  }
   if (msg?.type === "status") { sendResponse({ reading: !!session, state: session?.state ?? "idle", fallback: !!session?.usingFallback }); return; }
   if (msg?.type === "diag") {               // used by the automated tests
     Promise.resolve(toPlayer({ type: "stats" })).then((stats) => sendResponse({ log, stats, session, offscreen: USE_OFFSCREEN }));

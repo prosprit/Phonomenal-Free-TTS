@@ -45,6 +45,30 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
 | Use the keyboard | Select text, then press **Alt+Shift+R** (Mac: **Option+Shift+R**). Press it again to stop |
 | Change voice or speed | Click the Phonomenal icon. Pick a voice (6 men, 5 women) and Slower, Normal or Faster, then click **Hear this voice** |
 
+## Read a whole PDF
+
+<img src="docs/screenshots/pdf-reader.png" alt="The Phonomenal PDF reader highlighting the sentence being read" width="640">
+
+1. Open the PDF in your browser. Then do one of these:
+   - Click the Phonomenal icon and choose **Read this PDF**.
+   - Right-click the page and choose **Read this PDF aloud**.
+   - Press **Alt+Shift+R** with nothing selected.
+2. The PDF opens in the Phonomenal reader. Press **Read from page N** to start at the page you're looking at.
+
+While it reads:
+
+- **Read from anywhere.** Click any sentence, or select some words, then press **Read from here**. While it's reading, a click jumps straight to that sentence.
+- **Follow along.** The sentence being read is highlighted, and the page scrolls with it. If you scroll away, a **Back to where it's reading** button appears.
+- **Controls.** ⏮ and ⏭ skip back and forward a sentence (**Shift+←/→**). **Space** pauses and **Esc** stops. Voice and speed are in the top bar.
+- **Remembers your place.** Open the same PDF later and press **Continue reading**.
+- **Reads it like a book.** It skips page headers and page numbers, joins words split across lines, and reads a sentence that runs onto the next page in one go. Side notes and boxes are read at the end of each page; you can turn them off in ⚙.
+- **Starting from a selection.** In the browser's own PDF viewer, select some words, right-click, and choose **Read aloud from here to the end**.
+
+The first time you read a PDF from a website, Phonomenal asks to **Allow** that site once.
+
+- **PDFs on your computer in Chrome:** turn on **Allow access to file URLs** for Phonomenal once in `chrome://extensions`. Or open the reader from the icon (**Open a PDF from your computer…**) and choose the file.
+- **PDFs on your computer in Firefox:** always choose the file that way.
+
 ## Good to know
 
 - **First sound.** The first read after starting the browser takes about a third of a second while the voice loads. After that, speech starts almost instantly.
@@ -59,6 +83,7 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
   3. Run `python scripts/assemble.py` (needs Pillow).
 - **Make a shareable zip** (`dist/phonomenal-free-tts-<version>.zip`): `python scripts/package.py`
 - **How it works**
+  - PDFs: `reader.html` shows the PDF with PDF.js (Apache-2.0, in `vendor/pdfjs`). `pdftext.js` turns each page into paragraphs and sentences in reading order. `engine.js` speaks them one at a time, a few seconds ahead of playback, so the highlight can follow exactly.
   - Chrome: the service worker sends text to an offscreen document that runs `player.js`.
   - Firefox: the background event page runs `player.js` itself. While reading, the on-page bar pings every 10 s so Firefox doesn't unload it mid-sentence.
-- **Licences.** The Phonon model and voices are Apache-2.0 (Gradium). The phonon-tts runtime is MIT OR Apache-2.0. See `extension/model/LICENSE` and `extension/vendor/phonon-tts/`.
+- **Licences.** The Phonon model and voices are Apache-2.0 (Gradium). The phonon-tts runtime is MIT OR Apache-2.0. PDF.js (Mozilla) is Apache-2.0. See `extension/model/LICENSE`, `extension/vendor/phonon-tts/` and `extension/vendor/pdfjs/LICENSE`.

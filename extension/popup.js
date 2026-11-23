@@ -41,4 +41,13 @@ chrome.commands.getAll().then((cmds) => {
   $("shortcut").innerHTML = `Shortcut: ${k.split("+").map((p) => `<kbd>${p}</kbd>`).join(" + ")} reads your selection. Press again to stop.`;
   $("shortcut").hidden = false;
 });
-control("warm");   // load the voice while the user looks at the popup
+// PDFs open in the Phonomenal reader (page highlighting, read from any point)
+const reader = (file) => chrome.runtime.getURL("reader.html") + (file ? "?file=" + encodeURIComponent(file) : "");
+const [tab] = await chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []);
+let onPdf = false;
+try { onPdf = !!tab?.url && /\.pdf$/i.test(new URL(tab.url).pathname); } catch {}
+if (onPdf) { $("pdfCard").hidden = false; $("try").className = "btn wide"; }
+$("readPdf").onclick = async () => { await chrome.tabs.update(tab.id, { url: reader(tab.url) }); window.close(); };
+$("openPdf").onclick = async (e) => { e.preventDefault(); await chrome.tabs.create({ url: reader() }); window.close(); };
+
+if (!onPdf) control("warm");   // load the voice while the user looks at the popup

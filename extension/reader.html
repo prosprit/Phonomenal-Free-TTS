@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phonomenal PDF reader</title>
+<link rel="icon" href="icons/icon32.png">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="reader.css">
+</head>
+<body class="reader">
+<header class="bar" role="toolbar" aria-label="Reading controls">
+  <div class="doc">
+    <img src="icons/icon32.png" alt="" width="22" height="22">
+    <span id="title" class="title">Phonomenal</span>
+  </div>
+
+  <div class="transport">
+    <button class="ib" id="prev" type="button" aria-label="Previous sentence" title="Previous sentence (Shift+←)" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+    </button>
+    <button class="btn primary play" id="play" type="button" disabled>
+      <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
+      <span id="playLabel">Read from page 1</span>
+    </button>
+    <button class="ib" id="next" type="button" aria-label="Next sentence" title="Next sentence (Shift+→)" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
+    </button>
+    <button class="ib stopb" id="stop" type="button" aria-label="Stop reading" title="Stop (Esc)" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>
+    </button>
+  </div>
+
+  <div class="tools">
+    <label class="pg">Page <input id="pageIn" type="text" inputmode="numeric" aria-label="Go to page" value="–"> <span>of <span id="pageCount">–</span></span></label>
+    <div class="zoom">
+      <button class="ib sm" id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out (Ctrl −)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z"/></svg></button>
+      <span id="zoomVal" class="zv">100%</span>
+      <button class="ib sm" id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in (Ctrl +)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
+    </div>
+    <select id="voice" aria-label="Voice" title="Voice"></select>
+    <select id="speed" aria-label="Reading speed" title="Speed"></select>
+    <div class="more">
+      <button class="ib" id="moreBtn" type="button" aria-label="Reading options" aria-expanded="false" aria-controls="menu" title="Reading options">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8.4 4.6.1-1.1-.1-1.1 2.1-1.6-2-3.5-2.5 1a8 8 0 0 0-1.9-1.1L15.7 3h-4l-.4 2.7a8 8 0 0 0-1.9 1.1l-2.5-1-2 3.5L7 10.9l-.1 1.1.1 1.1-2.1 1.6 2 3.5 2.5-1c.6.5 1.2.8 1.9 1.1l.4 2.7h4l.4-2.7c.7-.3 1.3-.6 1.9-1.1l2.5 1 2-3.5z"/></svg>
+      </button>
+      <div class="menu" id="menu" hidden>
+        <label><input type="checkbox" id="optFollow"> Follow along as it reads</label>
+        <label><input type="checkbox" id="optSide"> Read side notes and boxes</label>
+        <label><input type="checkbox" id="optHeaders"> Skip page headers and numbers</label>
+        <p class="hint">Click any sentence to read from there. <kbd>Space</kbd> pauses, <kbd>Esc</kbd> stops.</p>
+      </div>
+    </div>
+  </div>
+  <div class="progress" id="progress" hidden><span></span></div>
+</header>
+
+<main id="viewer" tabindex="-1">
+  <div id="pages" class="pages"></div>
+  <section id="panel" class="panel" hidden>
+    <img src="icons/icon128.png" alt="" width="56" height="56">
+    <h1 id="panelTitle">Open a PDF to read aloud</h1>
+    <p id="panelText">Drop a PDF file here, or choose one from your computer.</p>
+    <div class="panel-actions">
+      <button class="btn primary" id="choose" type="button">Choose a PDF…</button>
+      <button class="btn" id="allow" type="button" hidden>Allow access</button>
+    </div>
+    <p class="small" id="panelNote" hidden></p>
+  </section>
+</main>
+
+<button class="chip" id="chip" type="button" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z"/></svg> Read from here
+</button>
+<button class="backbtn" id="back" type="button" hidden>Back to where it's reading</button>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<input type="file" id="file" accept="application/pdf,.pdf" hidden>
+<script type="module" src="reader.js"></script>
+</body>
+</html>
