@@ -35,7 +35,17 @@ const PDF_PATTERNS = ["*://*/*.pdf", "*://*/*.pdf?*", "*://*/*.pdf#*", "*://*/*.
 export function isPdfUrl(u) { try { return /\.pdf$/i.test(new URL(u).pathname); } catch { return false; } }
 const readerUrl = (file, find = "") =>
   chrome.runtime.getURL("reader.html") + "?file=" + encodeURIComponent(file) + (find ? "&find=" + encodeURIComponent(find.slice(0, 300)) : "");
-export function openReader(tab, find = "") { return chrome.tabs.update(tab.id, { url: readerUrl(tab.url, find) }); }
+export function openReader(tab, find = "") {
+  const id = tabIdOf(tab);
+  return id != null ? chrome.tabs.update(id, { url: readerUrl(tab.url, find) }) : chrome.tabs.create({ url: readerUrl(tab.url, find) });
+}
+
+// A real tab id, or null. Some Chrome versions report menu clicks inside their built-in PDF viewer with
+// tab.id -1 (or no tab at all); using that id makes tab APIs throw, which used to cancel reading silently.
+const tabIdOf = (tab) => (Number.isInteger(tab?.id) && tab.id >= 0 ? tab.id : null);
+async function activeTab() {
+  try { return (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0] ?? null; } catch { return null; }
+}
 
 function setMenus(reading) {
   chrome.contextMenus.update("read-aloud", { title: reading ? "Read aloud (start over)" : "Read aloud" }).catch(() => {});
@@ -55,8 +65,8 @@ async function showPill(tabId) {
 
 function notifyTab(state, extra = {}) {
   const { fallback = false } = extra;     // forward only what the UI needs
-  if (session?.tabId != null) chrome.tabs.sendMessage(session.tabId, { type: "read-aloud-state", state, fallback }).catch(() => {});
-  chrome.runtime.sendMessage({ target: "popup", type: "state", state, fallback }).catch(() => {});
+  try { if (session?.tabId != null) chrome.tabs.sendMessage(session.tabId, { type: "read-aloud-state", state, fallback }).catch(() => {}); } catch {}
+  try { chrome.runtime.sendMessage({ target: "popup", type: "state", state, fallback }).catch(() => {}); } catch {}
 }
 
 function cleanText(t) {
@@ -66,11 +76,13 @@ function cleanText(t) {
 export async function readText(text, tabId) {
   text = cleanText(text);
   if (!text) return { ok: false, reason: "empty" };
+  tabId = tabIdOf({ id: tabId });
   const s = await settings();
   stopFallback();
   session = { tabId, text, state: "loading", usingFallback: false, started: Date.now() };
   setMenus(true); setBadge("loading");
-  if (tabId != null) await showPill(tabId);
+  // on-page controls are a nicety: if the page refuses them (PDF viewer, browser pages), speak anyway
+  if (tabId != null) await Promise.race([showPill(tabId), new Promise((r) => setTimeout(r, 1500))]);
   notifyTab("loading");
   await toPlayer({ type: "speak", text, voice: s.voice, speed: s.speed });
   return { ok: true };
@@ -136,12 +148,20 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === "install") chrome.tabs.create({ url: "welcome.html" });
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "read-aloud") readText(info.selectionText, tab?.id);
-  if (info.menuItemId === "stop-reading") stopReading();
-  if (info.menuItemId === "pdf-from-here" && tab) openReader({ ...tab, url: info.pageUrl || tab.url }, info.selectionText);
-  if (info.menuItemId === "pdf-open" && tab) openReader({ ...tab, url: info.pageUrl || tab.url });
-});
+export async function onMenuClick(info, tab) {
+  log.push({ t: Date.now(), state: "menu", item: info.menuItemId, tabId: tab?.id ?? null, chars: (info.selectionText || "").length });
+  if (info.menuItemId === "stop-reading") return stopReading();
+  // where the click happened: the reported tab if it is real, otherwise the tab in front
+  const real = tabIdOf(tab) != null ? tab : (await activeTab()) || tab || {};
+  const url = info.pageUrl || real.url || "";
+  if (info.menuItemId === "read-aloud") {
+    if ((info.selectionText || "").trim()) return readText(info.selectionText, tabIdOf(real)).catch(() => {});
+    if (isPdfUrl(url)) return openReader({ id: tabIdOf(real), url });   // PDF viewer gave no text: use the reader
+  }
+  if (info.menuItemId === "pdf-from-here") return openReader({ id: tabIdOf(real), url }, info.selectionText);
+  if (info.menuItemId === "pdf-open") return openReader({ id: tabIdOf(real), url });
+}
+chrome.contextMenus.onClicked.addListener((info, tab) => { onMenuClick(info, tab).catch(() => {}); });
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command !== "read-selection") return;
@@ -191,4 +211,4 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 // Test hook (used by the Chrome end-to-end test; harmless otherwise).
-self.__readAloud = { readText, stopReading, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };
+self.__readAloud = { readText, onMenuClick, stopReading, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };
