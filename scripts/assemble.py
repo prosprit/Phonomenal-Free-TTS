@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXT = ROOT / "extension"
-NPM = ROOT / "browser-bench" / "node_modules" / "phonon-tts"
+NPM = next(p for p in (ROOT / "node_modules" / "phonon-tts", ROOT / "browser-bench" / "node_modules" / "phonon-tts") if p.exists())
 HUB = Path.home() / ".cache" / "huggingface" / "hub"
 MODEL = next((HUB / "models--gradium--phonon-31m-en" / "snapshots").iterdir())
 VOICES = next((HUB / "models--gradium--phonon-voices" / "snapshots").iterdir())

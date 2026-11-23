@@ -1,8 +1,9 @@
-# Large or regenerable local files
-bench/envs/
-bench/audio/
-browser-bench/node_modules/
+# Local-only: benchmark, test tools and their outputs (kept on disk, not published)
+bench/
+browser-bench/
+docs/*
+!docs/screenshots/
+node_modules/
 dist/
-browser-bench/*-results.json
 __pycache__/
 *.pyc

@@ -8,6 +8,13 @@ Select text on any web page, right-click, choose **Read aloud**, and it reads th
 - No account or internet is needed, and nothing you select is sent anywhere.
 - It works on Windows and macOS in Google Chrome 121+ and Chrome-based browsers (Edge, Brave), and in Firefox 128+.
 
+**Download:** get `phonomenal-free-tts-<version>.zip` from the [latest release](https://github.com/prosprit/Phonomenal-Free-TTS/releases/latest), then follow the steps below. You can also download this repository and use its `extension` folder.
+
+<p>
+  <img src="docs/screenshots/reading.png" alt="The on-page Reading aloud bar with Pause and Stop buttons" width="560"><br>
+  <img src="docs/screenshots/popup.png" alt="Settings popup with men's and women's voices and three speeds" width="300">
+</p>
+
 ## Install in Chrome, Edge or Brave (about 2 minutes)
 
 1. If someone sent you `phonomenal-free-tts-<version>.zip`, unzip it to a permanent place such as Documents. Chrome runs the extension from that folder, so don't move or delete it.
@@ -46,12 +53,11 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
 
 ## For whoever maintains it
 
-- **Rebuild the large files** (runtime, model, voices, icons): `python scripts/assemble.py`
+- **The large files are already in `extension/`** (runtime, model, voices, icons). To rebuild them after an update:
+  1. Run `npm install phonon-tts` in the repo root.
+  2. Download `gradium/phonon-31m-en` and `gradium/phonon-voices` from Hugging Face into its cache.
+  3. Run `python scripts/assemble.py` (needs Pillow).
 - **Make a shareable zip** (`dist/phonomenal-free-tts-<version>.zip`): `python scripts/package.py`
-- **Tests** run from `browser-bench/` after `npm install`:
-  - **Chrome.** Run `npx playwright install chromium` once, then `node e2e.mjs`. For the on-page bar, add `--ext <copy with host_permissions>`. For the backup voice, add `--fallback --ext <copy with a corrupted model>`.
-  - **Firefox.** Uses the installed Firefox: `node e2e-firefox.mjs --ext <copy with host_permissions and the test-bridge.js content script>`.
-  - **Screenshots** of every screen: `node shots.mjs`
 - **How it works**
   - Chrome: the service worker sends text to an offscreen document that runs `player.js`.
   - Firefox: the background event page runs `player.js` itself. While reading, the on-page bar pings every 10 s so Firefox doesn't unload it mid-sentence.
