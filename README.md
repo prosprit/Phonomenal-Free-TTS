@@ -1,5 +1,7 @@
 # Phonomenal Free TTS
 
+Before you say anything, yes this was put together with AI. I honestly just wanted a quick, nice sounding TTS for my mom so sue me. Everything else on the chrome extension store sounded so bad and was trying to price gouge its users so take this for free.
+
 Select text on any web page, right-click, choose **Read aloud**, and it reads the text in a natural voice.
 
 - The voice is Phonon 31M, and it runs entirely on your own computer.
