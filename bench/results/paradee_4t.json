@@ -1,0 +1,228 @@
+{
+ "model": "paradee",
+ "threads": 4,
+ "sample_rate": 24000,
+ "load_s": 0.487,
+ "first_audio_ms_median": 139.7,
+ "first_audio_ms_p90": 191.0,
+ "first_audio_ms_probe_median": 135.9,
+ "rtf": 0.0257,
+ "x_realtime": 38.9,
+ "peak_rss_mb": 719,
+ "n_ok": 30,
+ "n_err": 0,
+ "errors": [],
+ "items": [
+  {
+   "id": "news_1",
+   "first_audio_ms": 133.0,
+   "compute_s": 0.2586,
+   "audio_s": 10.25,
+   "n_sent": 2
+  },
+  {
+   "id": "news_2",
+   "first_audio_ms": 175.2,
+   "compute_s": 0.1752,
+   "audio_s": 7.575,
+   "n_sent": 1
+  },
+  {
+   "id": "news_3",
+   "first_audio_ms": 167.0,
+   "compute_s": 0.167,
+   "audio_s": 7.025,
+   "n_sent": 1
+  },
+  {
+   "id": "recipe_1",
+   "first_audio_ms": 95.5,
+   "compute_s": 0.2262,
+   "audio_s": 8.625,
+   "n_sent": 2
+  },
+  {
+   "id": "recipe_2",
+   "first_audio_ms": 116.4,
+   "compute_s": 0.2307,
+   "audio_s": 9.075,
+   "n_sent": 2
+  },
+  {
+   "id": "email_1",
+   "first_audio_ms": 190.1,
+   "compute_s": 0.2908,
+   "audio_s": 11.475,
+   "n_sent": 2
+  },
+  {
+   "id": "email_2",
+   "first_audio_ms": 81.9,
+   "compute_s": 0.2315,
+   "audio_s": 8.925,
+   "n_sent": 3
+  },
+  {
+   "id": "email_3",
+   "first_audio_ms": 100.8,
+   "compute_s": 0.1647,
+   "audio_s": 6.45,
+   "n_sent": 2
+  },
+  {
+   "id": "medical_1",
+   "first_audio_ms": 92.0,
+   "compute_s": 0.297,
+   "audio_s": 11.775,
+   "n_sent": 3
+  },
+  {
+   "id": "medical_2",
+   "first_audio_ms": 178.3,
+   "compute_s": 0.1783,
+   "audio_s": 6.975,
+   "n_sent": 1
+  },
+  {
+   "id": "letter_1",
+   "first_audio_ms": 221.1,
+   "compute_s": 0.4007,
+   "audio_s": 15.25,
+   "n_sent": 2
+  },
+  {
+   "id": "letter_2",
+   "first_audio_ms": 162.8,
+   "compute_s": 0.1628,
+   "audio_s": 6.45,
+   "n_sent": 1
+  },
+  {
+   "id": "wiki_1",
+   "first_audio_ms": 122.2,
+   "compute_s": 0.2632,
+   "audio_s": 10.175,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_2",
+   "first_audio_ms": 109.2,
+   "compute_s": 0.2671,
+   "audio_s": 10.475,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_3",
+   "first_audio_ms": 226.0,
+   "compute_s": 0.226,
+   "audio_s": 9.525,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_1",
+   "first_audio_ms": 198.6,
+   "compute_s": 0.1986,
+   "audio_s": 6.75,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_2",
+   "first_audio_ms": 138.4,
+   "compute_s": 0.1384,
+   "audio_s": 5.925,
+   "n_sent": 1
+  },
+  {
+   "id": "num_1",
+   "first_audio_ms": 186.3,
+   "compute_s": 0.1863,
+   "audio_s": 7.05,
+   "n_sent": 1
+  },
+  {
+   "id": "num_2",
+   "first_audio_ms": 168.2,
+   "compute_s": 0.1682,
+   "audio_s": 6.575,
+   "n_sent": 1
+  },
+  {
+   "id": "num_3",
+   "first_audio_ms": 174.2,
+   "compute_s": 0.1742,
+   "audio_s": 6.725,
+   "n_sent": 1
+  },
+  {
+   "id": "date_1",
+   "first_audio_ms": 162.5,
+   "compute_s": 0.1625,
+   "audio_s": 6.25,
+   "n_sent": 1
+  },
+  {
+   "id": "url_1",
+   "first_audio_ms": 170.3,
+   "compute_s": 0.1703,
+   "audio_s": 6.5,
+   "n_sent": 1
+  },
+  {
+   "id": "question_1",
+   "first_audio_ms": 92.6,
+   "compute_s": 0.1717,
+   "audio_s": 5.875,
+   "n_sent": 2
+  },
+  {
+   "id": "names_1",
+   "first_audio_ms": 141.0,
+   "compute_s": 0.141,
+   "audio_s": 5.1,
+   "n_sent": 1
+  },
+  {
+   "id": "homograph_1",
+   "first_audio_ms": 96.4,
+   "compute_s": 0.1714,
+   "audio_s": 6.725,
+   "n_sent": 2
+  },
+  {
+   "id": "quote_1",
+   "first_audio_ms": 66.3,
+   "compute_s": 0.1583,
+   "audio_s": 5.85,
+   "n_sent": 2
+  },
+  {
+   "id": "list_1",
+   "first_audio_ms": 124.1,
+   "compute_s": 0.1241,
+   "audio_s": 4.8,
+   "n_sent": 1
+  },
+  {
+   "id": "short_1",
+   "first_audio_ms": 46.0,
+   "compute_s": 0.046,
+   "audio_s": 1.275,
+   "n_sent": 1
+  },
+  {
+   "id": "short_2",
+   "first_audio_ms": 59.3,
+   "compute_s": 0.0593,
+   "audio_s": 2.075,
+   "n_sent": 1
+  },
+  {
+   "id": "long_1",
+   "first_audio_ms": 188.3,
+   "compute_s": 0.751,
+   "audio_s": 30.15,
+   "n_sent": 4
+  }
+ ],
+ "cpu": "AMD Ryzen 5 5600X (pinned to 4 core(s))"
+}

@@ -1,0 +1,62 @@
+{
+ "Everly": {
+  "voice_id": "vjFyp2BcCyTlUmYb",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Rounded, soft-edged tone with gentle lift at the end of phrases and an easy, relaxed delivery."
+ },
+ "Harper": {
+  "voice_id": "4SZHfMpw-p46Ywgs",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Modern, confident and friendly voice with a standard American accent."
+ },
+ "Hadley": {
+  "voice_id": "bXwrkHhURL1VFJdG",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Settled, even-toned and genuinely kind, with crisp consonants that hold up over a handset."
+ },
+ "Delia": {
+  "voice_id": "nGzMHMPAWGaJFHOo",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Low, grounded and quick to the point, with a sincerity that keeps an apology honest."
+ },
+ "Trevor": {
+  "voice_id": "0zLApsZfVLLNaEGl",
+  "gender": "male",
+  "locale": "en-us",
+  "description": "Buoyant energy over a resonant mid-low core, phrases landing softly and consonants cutting through a handset."
+ },
+ "Preston": {
+  "voice_id": "qIxlZ7Ei8KvWlyQH",
+  "gender": "male",
+  "locale": "en-us",
+  "description": "Trim, focused delivery with clean edges on every consonant and a steady, low-set core that carries through phone bandwidth."
+ },
+ "Hugh": {
+  "voice_id": "YyKcxPG7iIgS3jsK",
+  "gender": "male",
+  "locale": "en-gb",
+  "description": "Soft and close, airy in texture, with lively pitch movement and an attentive, sincere delivery."
+ },
+ "Edwin": {
+  "voice_id": "zUCxzrOrugTSis03",
+  "gender": "male",
+  "locale": "en-gb",
+  "description": "Efficient and firm, sincere in attention, with tidy articulation that holds up at phone bandwidth."
+ },
+ "Spencer": {
+  "voice_id": "JOW0vchyswkQUMDS",
+  "gender": "male",
+  "locale": "en-gb",
+  "description": "Light and airy, sitting a touch higher, with crisp consonants and a slow, patient delivery."
+ },
+ "Bryony": {
+  "voice_id": "gfP44RlHwr2kEwk7",
+  "gender": "female",
+  "locale": "en-gb",
+  "description": "Full, rich mid-range tones, softly relaxed and spoken close to the mic, moving briskly with light pitch play."
+ }
+}

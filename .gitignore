@@ -1,0 +1,8 @@
+# Large or regenerable local files
+bench/envs/
+bench/audio/
+browser-bench/node_modules/
+dist/
+browser-bench/*-results.json
+__pycache__/
+*.pyc

@@ -1,0 +1,228 @@
+{
+ "model": "supertonic",
+ "threads": 4,
+ "sample_rate": 44100,
+ "load_s": 0.814,
+ "first_audio_ms_median": 1619.3,
+ "first_audio_ms_p90": 2157.6,
+ "first_audio_ms_probe_median": 1439.3,
+ "rtf": 0.2934,
+ "x_realtime": 3.4,
+ "peak_rss_mb": 538,
+ "n_ok": 30,
+ "n_err": 0,
+ "errors": [],
+ "items": [
+  {
+   "id": "news_1",
+   "first_audio_ms": 1508.9,
+   "compute_s": 3.0847,
+   "audio_s": 10.261,
+   "n_sent": 2
+  },
+  {
+   "id": "news_2",
+   "first_audio_ms": 2498.5,
+   "compute_s": 2.4985,
+   "audio_s": 8.091,
+   "n_sent": 1
+  },
+  {
+   "id": "news_3",
+   "first_audio_ms": 2113.0,
+   "compute_s": 2.113,
+   "audio_s": 7.673,
+   "n_sent": 1
+  },
+  {
+   "id": "recipe_1",
+   "first_audio_ms": 1095.5,
+   "compute_s": 2.8663,
+   "audio_s": 8.52,
+   "n_sent": 2
+  },
+  {
+   "id": "recipe_2",
+   "first_audio_ms": 1863.6,
+   "compute_s": 3.183,
+   "audio_s": 9.634,
+   "n_sent": 2
+  },
+  {
+   "id": "email_1",
+   "first_audio_ms": 2155.0,
+   "compute_s": 3.5721,
+   "audio_s": 12.49,
+   "n_sent": 2
+  },
+  {
+   "id": "email_2",
+   "first_audio_ms": 1027.4,
+   "compute_s": 2.985,
+   "audio_s": 9.157,
+   "n_sent": 3
+  },
+  {
+   "id": "email_3",
+   "first_audio_ms": 1459.7,
+   "compute_s": 2.4557,
+   "audio_s": 7.475,
+   "n_sent": 2
+  },
+  {
+   "id": "medical_1",
+   "first_audio_ms": 1032.3,
+   "compute_s": 3.6676,
+   "audio_s": 11.735,
+   "n_sent": 3
+  },
+  {
+   "id": "medical_2",
+   "first_audio_ms": 1958.0,
+   "compute_s": 1.958,
+   "audio_s": 7.395,
+   "n_sent": 1
+  },
+  {
+   "id": "letter_1",
+   "first_audio_ms": 2052.4,
+   "compute_s": 3.8794,
+   "audio_s": 13.396,
+   "n_sent": 2
+  },
+  {
+   "id": "letter_2",
+   "first_audio_ms": 1873.3,
+   "compute_s": 1.8733,
+   "audio_s": 6.628,
+   "n_sent": 1
+  },
+  {
+   "id": "wiki_1",
+   "first_audio_ms": 1277.2,
+   "compute_s": 3.1395,
+   "audio_s": 10.679,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_2",
+   "first_audio_ms": 1223.8,
+   "compute_s": 2.9755,
+   "audio_s": 10.47,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_3",
+   "first_audio_ms": 2564.1,
+   "compute_s": 2.5641,
+   "audio_s": 9.624,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_1",
+   "first_audio_ms": 1573.0,
+   "compute_s": 1.573,
+   "audio_s": 5.723,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_2",
+   "first_audio_ms": 1858.5,
+   "compute_s": 1.8585,
+   "audio_s": 6.35,
+   "n_sent": 1
+  },
+  {
+   "id": "num_1",
+   "first_audio_ms": 1979.8,
+   "compute_s": 1.9798,
+   "audio_s": 7.952,
+   "n_sent": 1
+  },
+  {
+   "id": "num_2",
+   "first_audio_ms": 1970.9,
+   "compute_s": 1.9709,
+   "audio_s": 7.743,
+   "n_sent": 1
+  },
+  {
+   "id": "num_3",
+   "first_audio_ms": 1932.0,
+   "compute_s": 1.932,
+   "audio_s": 6.907,
+   "n_sent": 1
+  },
+  {
+   "id": "date_1",
+   "first_audio_ms": 1693.2,
+   "compute_s": 1.6932,
+   "audio_s": 6.28,
+   "n_sent": 1
+  },
+  {
+   "id": "url_1",
+   "first_audio_ms": 1610.7,
+   "compute_s": 1.6107,
+   "audio_s": 5.374,
+   "n_sent": 1
+  },
+  {
+   "id": "question_1",
+   "first_audio_ms": 1225.7,
+   "compute_s": 2.2078,
+   "audio_s": 6.43,
+   "n_sent": 2
+  },
+  {
+   "id": "names_1",
+   "first_audio_ms": 1627.9,
+   "compute_s": 1.6279,
+   "audio_s": 5.444,
+   "n_sent": 1
+  },
+  {
+   "id": "homograph_1",
+   "first_audio_ms": 1336.1,
+   "compute_s": 2.3172,
+   "audio_s": 7.127,
+   "n_sent": 2
+  },
+  {
+   "id": "quote_1",
+   "first_audio_ms": 964.6,
+   "compute_s": 2.0095,
+   "audio_s": 6.43,
+   "n_sent": 2
+  },
+  {
+   "id": "list_1",
+   "first_audio_ms": 1544.1,
+   "compute_s": 1.5441,
+   "audio_s": 5.305,
+   "n_sent": 1
+  },
+  {
+   "id": "short_1",
+   "first_audio_ms": 719.5,
+   "compute_s": 0.7195,
+   "audio_s": 1.474,
+   "n_sent": 1
+  },
+  {
+   "id": "short_2",
+   "first_audio_ms": 758.1,
+   "compute_s": 0.7581,
+   "audio_s": 1.961,
+   "n_sent": 1
+  },
+  {
+   "id": "long_1",
+   "first_audio_ms": 2181.1,
+   "compute_s": 8.5406,
+   "audio_s": 32.435,
+   "n_sent": 4
+  }
+ ],
+ "cpu": "AMD Ryzen 5 5600X (pinned to 4 core(s))"
+}

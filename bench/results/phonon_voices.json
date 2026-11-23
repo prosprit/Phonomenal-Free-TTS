@@ -1,0 +1,46 @@
+{
+ "Bryony": {
+  "pitch_hz": 187,
+  "gender": "F"
+ },
+ "Delia": {
+  "pitch_hz": 179,
+  "gender": "F"
+ },
+ "Edwin": {
+  "pitch_hz": 133,
+  "gender": "M"
+ },
+ "Everly": {
+  "pitch_hz": 170,
+  "gender": "F"
+ },
+ "Hadley": {
+  "pitch_hz": 178,
+  "gender": "F"
+ },
+ "Harper": {
+  "pitch_hz": 182,
+  "gender": "F"
+ },
+ "Hugh": {
+  "pitch_hz": 134,
+  "gender": "M"
+ },
+ "Preston": {
+  "pitch_hz": 100,
+  "gender": "M"
+ },
+ "Spencer": {
+  "pitch_hz": 124,
+  "gender": "M"
+ },
+ "Trevor": {
+  "pitch_hz": 115,
+  "gender": "M"
+ },
+ "default": {
+  "pitch_hz": 108,
+  "gender": "M"
+ }
+}

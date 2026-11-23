@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Phonomenal is ready</title><link rel="stylesheet" href="ui.css"></head>
+<body class="welcome">
+<main>
+  <header class="head big">
+    <img src="icons/icon128.png" alt="" width="56" height="56">
+    <h1>Phonomenal is ready</h1>
+  </header>
+  <p class="lead">It reads text on any web page aloud in a natural voice. It runs on this computer, so nothing you read is sent anywhere.</p>
+  <ol class="steps">
+    <li>Select some words with your mouse.</li>
+    <li><b>Right-click</b> on them.</li>
+    <li>Choose <b>Read aloud</b>.</li>
+  </ol>
+  <section class="try">
+    <p class="demo" id="demo">Good morning! The weather today will be sunny and mild, with a light breeze in the afternoon. It is a lovely day for a walk.</p>
+    <button class="btn primary" id="toggle" type="button">Read this to me</button>
+    <span class="status" id="status" aria-live="polite"></span>
+  </section>
+  <p class="tip"><b>Tip:</b> to change the voice or speed, click the puzzle-piece icon at the top-right of the browser, then pin <b>Phonomenal</b> so its icon is always there.</p>
+</main>
+<script type="module" src="welcome.js"></script>
+</body>
+</html>

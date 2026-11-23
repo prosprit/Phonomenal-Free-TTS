@@ -1,0 +1,228 @@
+{
+ "model": "kokoro",
+ "threads": 1,
+ "sample_rate": 24000,
+ "load_s": 0.665,
+ "first_audio_ms_median": 4081.6,
+ "first_audio_ms_p90": 6367.3,
+ "first_audio_ms_probe_median": 4575.9,
+ "rtf": 0.8242,
+ "x_realtime": 1.2,
+ "peak_rss_mb": 502,
+ "n_ok": 30,
+ "n_err": 0,
+ "errors": [],
+ "items": [
+  {
+   "id": "news_1",
+   "first_audio_ms": 3084.8,
+   "compute_s": 6.006,
+   "audio_s": 9.281,
+   "n_sent": 2
+  },
+  {
+   "id": "news_2",
+   "first_audio_ms": 5050.1,
+   "compute_s": 5.0501,
+   "audio_s": 7.083,
+   "n_sent": 1
+  },
+  {
+   "id": "news_3",
+   "first_audio_ms": 4754.8,
+   "compute_s": 4.7548,
+   "audio_s": 6.721,
+   "n_sent": 1
+  },
+  {
+   "id": "recipe_1",
+   "first_audio_ms": 1866.6,
+   "compute_s": 4.9538,
+   "audio_s": 7.425,
+   "n_sent": 2
+  },
+  {
+   "id": "recipe_2",
+   "first_audio_ms": 3103.7,
+   "compute_s": 5.544,
+   "audio_s": 8.193,
+   "n_sent": 2
+  },
+  {
+   "id": "email_1",
+   "first_audio_ms": 4694.4,
+   "compute_s": 7.3157,
+   "audio_s": 10.561,
+   "n_sent": 2
+  },
+  {
+   "id": "email_2",
+   "first_audio_ms": 1839.9,
+   "compute_s": 5.4151,
+   "audio_s": 7.106,
+   "n_sent": 3
+  },
+  {
+   "id": "email_3",
+   "first_audio_ms": 2754.4,
+   "compute_s": 4.1,
+   "audio_s": 5.441,
+   "n_sent": 2
+  },
+  {
+   "id": "medical_1",
+   "first_audio_ms": 2338.8,
+   "compute_s": 7.6244,
+   "audio_s": 9.837,
+   "n_sent": 3
+  },
+  {
+   "id": "medical_2",
+   "first_audio_ms": 4782.0,
+   "compute_s": 4.782,
+   "audio_s": 6.102,
+   "n_sent": 1
+  },
+  {
+   "id": "letter_1",
+   "first_audio_ms": 5922.4,
+   "compute_s": 10.6472,
+   "audio_s": 13.249,
+   "n_sent": 2
+  },
+  {
+   "id": "letter_2",
+   "first_audio_ms": 4722.0,
+   "compute_s": 4.722,
+   "audio_s": 6.315,
+   "n_sent": 1
+  },
+  {
+   "id": "wiki_1",
+   "first_audio_ms": 2948.1,
+   "compute_s": 6.7433,
+   "audio_s": 9.089,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_2",
+   "first_audio_ms": 3307.6,
+   "compute_s": 6.7979,
+   "audio_s": 10.156,
+   "n_sent": 2
+  },
+  {
+   "id": "wiki_3",
+   "first_audio_ms": 6346.1,
+   "compute_s": 6.3461,
+   "audio_s": 9.43,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_1",
+   "first_audio_ms": 3268.1,
+   "compute_s": 3.2681,
+   "audio_s": 4.694,
+   "n_sent": 1
+  },
+  {
+   "id": "abbr_2",
+   "first_audio_ms": 4203.8,
+   "compute_s": 4.2038,
+   "audio_s": 5.761,
+   "n_sent": 1
+  },
+  {
+   "id": "num_1",
+   "first_audio_ms": 5436.7,
+   "compute_s": 5.4367,
+   "audio_s": 6.593,
+   "n_sent": 1
+  },
+  {
+   "id": "num_2",
+   "first_audio_ms": 7988.3,
+   "compute_s": 7.9883,
+   "audio_s": 8.363,
+   "n_sent": 1
+  },
+  {
+   "id": "num_3",
+   "first_audio_ms": 6557.6,
+   "compute_s": 6.5576,
+   "audio_s": 6.806,
+   "n_sent": 1
+  },
+  {
+   "id": "date_1",
+   "first_audio_ms": 5880.1,
+   "compute_s": 5.8801,
+   "audio_s": 5.782,
+   "n_sent": 1
+  },
+  {
+   "id": "url_1",
+   "first_audio_ms": 6337.9,
+   "compute_s": 6.3379,
+   "audio_s": 6.571,
+   "n_sent": 1
+  },
+  {
+   "id": "question_1",
+   "first_audio_ms": 2866.8,
+   "compute_s": 5.0236,
+   "audio_s": 4.844,
+   "n_sent": 2
+  },
+  {
+   "id": "names_1",
+   "first_audio_ms": 4354.7,
+   "compute_s": 4.3547,
+   "audio_s": 4.566,
+   "n_sent": 1
+  },
+  {
+   "id": "homograph_1",
+   "first_audio_ms": 3242.0,
+   "compute_s": 5.7474,
+   "audio_s": 5.399,
+   "n_sent": 2
+  },
+  {
+   "id": "quote_1",
+   "first_audio_ms": 2073.7,
+   "compute_s": 4.8517,
+   "audio_s": 4.78,
+   "n_sent": 2
+  },
+  {
+   "id": "list_1",
+   "first_audio_ms": 3959.3,
+   "compute_s": 3.9593,
+   "audio_s": 4.075,
+   "n_sent": 1
+  },
+  {
+   "id": "short_1",
+   "first_audio_ms": 1056.5,
+   "compute_s": 1.0565,
+   "audio_s": 0.918,
+   "n_sent": 1
+  },
+  {
+   "id": "short_2",
+   "first_audio_ms": 1628.4,
+   "compute_s": 1.6284,
+   "audio_s": 1.515,
+   "n_sent": 1
+  },
+  {
+   "id": "long_1",
+   "first_audio_ms": 7554.4,
+   "compute_s": 28.5495,
+   "audio_s": 28.589,
+   "n_sent": 4
+  }
+ ],
+ "cpu": "AMD Ryzen 5 5600X (pinned to 1 core(s))"
+}
