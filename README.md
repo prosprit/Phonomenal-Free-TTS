@@ -11,7 +11,8 @@ Select text on any web page, right-click, choose **Read aloud**, and it reads th
 **Download:** get `phonomenal-free-tts-<version>.zip` from the [latest release](https://github.com/prosprit/Phonomenal-Free-TTS/releases/latest), then follow the steps below. You can also download this repository and use its `extension` folder.
 
 <p>
-  <img src="docs/screenshots/reading.png" alt="The on-page Reading aloud bar with Pause and Stop buttons" width="560"><br>
+  <img src="docs/screenshots/reading.png" alt="A sentence highlighted as it is read, with the Reading aloud bar and its Pause and Stop buttons" width="560"><br>
+  <img src="docs/screenshots/continue.png" alt="When it finishes, a Continue reading button appears right after the last word read" width="560"><br>
   <img src="docs/screenshots/popup.png" alt="Settings popup with men's and women's voices and three speeds" width="300">
 </p>
 
