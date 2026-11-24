@@ -13,7 +13,8 @@ Select text on any web page, right-click, choose **Read aloud**, and it reads th
 <p>
  <img width="320" height="578" alt="image" src="https://github.com/user-attachments/assets/40ec206c-c46a-4673-be0f-3de82451afdf" />
  <img width="1540" height="765" alt="image" src="https://github.com/user-attachments/assets/20d1cd19-89dd-4c23-b9d3-dda9f427ad78" />
- <img width="1903" height="900" alt="image" src="https://github.com/user-attachments/assets/4314d98a-70f5-4c2c-a218-6a1a03d123a4" />
+ <img width="1889" height="899" alt="image" src="https://github.com/user-attachments/assets/2e04d3ff-1806-484f-8615-9fe282542d26" />
+
 
 </p>
 
