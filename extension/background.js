@@ -47,11 +47,6 @@ async function activeTab() {
   try { return (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0] ?? null; } catch { return null; }
 }
 
-function setMenus(reading) {
-  chrome.contextMenus.update("read-aloud", { title: reading ? "Read aloud (start over)" : "Read aloud" }).catch(() => {});
-  chrome.contextMenus.update("stop-reading", { visible: reading }).catch(() => {});
-}
-
 function setBadge(state) {
   const on = ["loading", "speaking", "paused"].includes(state);
   chrome.action.setBadgeBackgroundColor({ color: state === "paused" ? "#8a6d00" : "#2f5d8a" });
@@ -65,7 +60,7 @@ async function showPill(tabId) {
 
 function notifyTab(state, extra = {}) {
   const { fallback = false } = extra;     // forward only what the UI needs
-  try { if (session?.tabId != null) chrome.tabs.sendMessage(session.tabId, { type: "read-aloud-state", state, fallback }).catch(() => {}); } catch {}
+  try { if (session?.tabId != null) chrome.tabs.sendMessage(session.tabId, { type: "read-aloud-state", state, fallback, run: session.run }).catch(() => {}); } catch {}
   try { chrome.runtime.sendMessage({ target: "popup", type: "state", state, fallback }).catch(() => {}); } catch {}
 }
 
@@ -73,19 +68,50 @@ function cleanText(t) {
   return String(t || "").replace(/­/g, "").replace(/[ \t ]+/g, " ").replace(/\s*\n\s*/g, "\n").trim();
 }
 
+const within = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(() => r(null), ms))]);
+
+async function begin(tabId, text, run) {
+  stopFallback();
+  if (session && session.tabId !== tabId) notifyTab("stopped");     // clear the controls and highlight in the old tab
+  session = { tabId, text, run, state: "loading", usingFallback: false, started: Date.now() };
+  setBadge("loading");
+  // on-page controls are a nicety: if the page refuses them (PDF viewer, browser pages), speak anyway
+  if (tabId != null) await within(showPill(tabId), 1500);
+  notifyTab("loading");
+}
+
+/** Speak one piece of text (the popup's sample, the welcome page, text the page reader can't follow). */
 export async function readText(text, tabId) {
   text = cleanText(text);
   if (!text) return { ok: false, reason: "empty" };
   tabId = tabIdOf({ id: tabId });
   const s = await settings();
-  stopFallback();
-  session = { tabId, text, state: "loading", usingFallback: false, started: Date.now() };
-  setMenus(true); setBadge("loading");
-  // on-page controls are a nicety: if the page refuses them (PDF viewer, browser pages), speak anyway
-  if (tabId != null) await Promise.race([showPill(tabId), new Promise((r) => setTimeout(r, 1500))]);
-  notifyTab("loading");
+  await begin(tabId, text, null);
   await toPlayer({ type: "speak", text, voice: s.voice, speed: s.speed });
   return { ok: true };
+}
+
+/** Read a page sentence by sentence from where the user chose (items come from pagereader.js). */
+export async function readSeq(items, run, tabId) {
+  items = (items || []).map((it) => ({ text: cleanText(it.text), pause: Math.min(1, Math.max(0, +it.pause || 0.12)) })).filter((it) => it.text);
+  if (!items.length) return { ok: false, reason: "empty" };
+  tabId = tabIdOf({ id: tabId });
+  const s = await settings();
+  await begin(tabId, items.map((it) => it.text).join(" "), String(run));
+  await toPlayer({ type: "speak-seq", items, voice: s.voice, speed: s.speed });
+  return { ok: true };
+}
+
+/** "Read aloud from here": read onward from the selection in that frame. False if the page can't be followed. */
+export async function readFromPage(tabId, frameId = 0) {
+  if (tabId == null) return false;
+  try {
+    const injected = await within(chrome.scripting.executeScript({ target: { tabId, frameIds: [frameId] }, files: ["pagereader.js"] }), 2000);
+    if (!injected) return false;
+    const res = await within(chrome.tabs.sendMessage(tabId, { type: "phonomenal-read-selection" }, { frameId }), 3000);
+    if (!res?.items?.length) return false;
+    return (await readSeq(res.items, res.run, tabId)).ok;
+  } catch { return false; }
 }
 
 export async function stopReading() {
@@ -96,7 +122,7 @@ export async function stopReading() {
 
 function finish(state) {
   notifyTab(state);
-  setMenus(false); setBadge(state);
+  setBadge(state);
   session = null;
 }
 
@@ -132,6 +158,12 @@ function onPlayerState(msg) {
   log.push({ t: Date.now(), ...msg }); if (log.length > 200) log.shift();
   if (["offscreen-ready", "ready"].includes(msg.state)) return;
   if (!session || session.usingFallback) return;
+  if (msg.state === "sentence") {             // highlight the sentence now being heard
+    if (session.run && session.tabId != null) {
+      try { chrome.tabs.sendMessage(session.tabId, { type: "read-aloud-sentence", run: session.run, index: msg.index }).catch(() => {}); } catch {}
+    }
+    return;
+  }
   if (msg.state === "error" && msg.phase === "load") return void fallbackSpeak(msg.error);
   session.state = msg.state;
   if (["done", "stopped", "error"].includes(msg.state)) finish(msg.state);
@@ -140,38 +172,42 @@ function onPlayerState(msg) {
 
 chrome.runtime.onInstalled.addListener(({ reason }) => {
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({ id: "read-aloud", title: "Read aloud", contexts: ["selection"] });
-    chrome.contextMenus.create({ id: "stop-reading", title: "Stop reading", contexts: ["all"], visible: false });
-    chrome.contextMenus.create({ id: "pdf-from-here", title: "Read aloud from here to the end", contexts: ["selection"], documentUrlPatterns: PDF_PATTERNS });
-    chrome.contextMenus.create({ id: "pdf-open", title: "Read this PDF aloud", contexts: ["page", "frame"], documentUrlPatterns: PDF_PATTERNS });
+    // One item per situation, so the browser shows it directly instead of under a "Phonomenal" submenu
+    // (Chrome nests an extension's items as soon as more than one matches, hidden ones included).
+    chrome.contextMenus.create({ id: "read-aloud", title: "Read aloud from here", contexts: ["selection"] });
+    chrome.contextMenus.create({ id: "pdf-open", title: "Read this PDF aloud", contexts: ["page"], documentUrlPatterns: PDF_PATTERNS });
   });
   if (reason === "install") chrome.tabs.create({ url: "welcome.html" });
 });
 
 export async function onMenuClick(info, tab) {
   log.push({ t: Date.now(), state: "menu", item: info.menuItemId, tabId: tab?.id ?? null, chars: (info.selectionText || "").length });
-  if (info.menuItemId === "stop-reading") return stopReading();
   // where the click happened: the reported tab if it is real, otherwise the tab in front
   const real = tabIdOf(tab) != null ? tab : (await activeTab()) || tab || {};
   const url = info.pageUrl || real.url || "";
+  const id = tabIdOf(real);
   if (info.menuItemId === "read-aloud") {
-    if ((info.selectionText || "").trim()) return readText(info.selectionText, tabIdOf(real)).catch(() => {});
-    if (isPdfUrl(url)) return openReader({ id: tabIdOf(real), url });   // PDF viewer gave no text: use the reader
+    // a PDF: the reader opens at the selected words and reads on through the document
+    if (isPdfUrl(url)) return openReader({ id, url }, info.selectionText || "");
+    // a web page: read on from the selection, following along on the page
+    if (tabIdOf(tab) != null && await readFromPage(id, info.frameId ?? 0)) return;
+    // pages that can't be followed (browser pages, text boxes): just read the selected text
+    if ((info.selectionText || "").trim()) return readText(info.selectionText, id);
   }
-  if (info.menuItemId === "pdf-from-here") return openReader({ id: tabIdOf(real), url }, info.selectionText);
-  if (info.menuItemId === "pdf-open") return openReader({ id: tabIdOf(real), url });
+  if (info.menuItemId === "pdf-open") return openReader({ id, url });
 }
 chrome.contextMenus.onClicked.addListener((info, tab) => { onMenuClick(info, tab).catch(() => {}); });
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command !== "read-selection") return;
   if (session) return stopReading();
-  if (!tab?.id) return;
+  if (tabIdOf(tab) == null) return;
+  if (isPdfUrl(tab.url)) return openReader(tab);       // the browser's PDF viewer can't be read from: open the reader
+  if (await readFromPage(tab.id, 0)) return;           // read on from the selection
   try {
     const [{ result }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => String(getSelection() || "") });
     if (result.trim()) readText(result, tab.id);
-    else if (isPdfUrl(tab.url)) openReader(tab);      // on a PDF with nothing selected: open the reader
-  } catch { if (isPdfUrl(tab.url)) openReader(tab); /* page does not allow scripts */ }
+  } catch { /* page does not allow scripts */ }
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -181,6 +217,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "pause" && session && !session.usingFallback) toPlayer({ type: "pause" });
     if (msg.action === "resume" && session && !session.usingFallback) toPlayer({ type: "resume" });
     if (msg.action === "read") readText(msg.text, msg.tabId ?? sender.tab?.id ?? null);
+    if (msg.action === "read-seq") readSeq(msg.items, msg.run, sender.tab?.id ?? null);   // a jump within the page being read
     if (msg.action === "warm") settings().then((s) => toPlayer({ type: "warm", speed: s.speed }));
     if (msg.action === "open-pdf" && msg.url) {
       if (msg.newTab) chrome.tabs.create({ url: readerUrl(msg.url, msg.find) });
@@ -211,4 +248,4 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 // Test hook (used by the Chrome end-to-end test; harmless otherwise).
-self.__readAloud = { readText, onMenuClick, stopReading, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };
+self.__readAloud = { readText, readSeq, readFromPage, onMenuClick, stopReading, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };

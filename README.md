@@ -2,7 +2,7 @@
 
 Before you say anything, yes this was put together with AI. I honestly just wanted a quick, nice sounding TTS for my mom so sue me. Everything else on the chrome extension store sounded so bad and was trying to price gouge its users so take this for free.
 
-Select text on any web page, right-click, choose **Read aloud**, and it reads the text in a natural voice.
+Select text on any web page, right-click, choose **Read aloud from here**, and it reads on down the page in a natural voice, highlighting each sentence.
 
 - The voice is Phonon 31M, and it runs entirely on your own computer.
 - No account or internet is needed, and nothing you select is sent anywhere.
@@ -39,8 +39,9 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
 
 | To… | Do this |
 |---|---|
-| Read something | Select text, right-click it, choose **Read aloud** |
-| Stop | Click the red **Stop** at the bottom-right of the page, press **Esc**, or right-click and choose **Stop reading** |
+| Read something | Select where to start, right-click, choose **Read aloud from here**. It reads on to the end of the article, highlighting each sentence and scrolling with it |
+| Jump to another part | While it reads, click any sentence. Or select some words and press **Read from here** |
+| Stop | Click the red **Stop** at the bottom-right of the page, or press **Esc** |
 | Pause | **Pause** on the same bar, then **Resume** |
 | Use the keyboard | Select text, then press **Alt+Shift+R** (Mac: **Option+Shift+R**). Press it again to stop |
 | Change voice or speed | Click the Phonomenal icon. Pick a voice (6 men, 5 women) and Slower, Normal or Faster, then click **Hear this voice** |
@@ -51,7 +52,7 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
 
 1. Open the PDF in your browser. Then do one of these:
    - Click the Phonomenal icon and choose **Read this PDF**.
-   - Right-click the page and choose **Read this PDF aloud**.
+   - Right-click the page (with nothing selected) and choose **Read this PDF aloud**.
    - Press **Alt+Shift+R** with nothing selected.
 2. The PDF opens in the Phonomenal reader. Press **Read from page N** to start at the page you're looking at.
 
@@ -62,7 +63,7 @@ While it reads:
 - **Controls.** ⏮ and ⏭ skip back and forward a sentence (**Shift+←/→**). **Space** pauses and **Esc** stops. Voice and speed are in the top bar.
 - **Remembers your place.** Open the same PDF later and press **Continue reading**.
 - **Reads it like a book.** It skips page headers and page numbers, joins words split across lines, and reads a sentence that runs onto the next page in one go. Side notes and boxes are read at the end of each page; you can turn them off in ⚙.
-- **Starting from a selection.** In the browser's own PDF viewer, select some words, right-click, and choose **Read aloud from here to the end**.
+- **Starting from a selection.** In the browser's own PDF viewer, select some words, right-click, and choose **Read aloud from here**. The reader opens at those words and reads on.
 
 The first time you read a PDF from a website, Phonomenal asks to **Allow** that site once.
 
@@ -72,7 +73,8 @@ The first time you read a PDF from a website, Phonomenal asks to **Allow** that 
 ## Good to know
 
 - **First sound.** The first read after starting the browser takes about a third of a second while the voice loads. After that, speech starts almost instantly.
-- **Browser pages.** The browser's own pages and the add-on stores don't allow the on-page buttons. Reading still works there; stop it from the icon or the right-click menu.
+- **What it reads on a web page.** The article text from where you start: it skips menus, sidebars, tables, picture captions and citation marks like [1], and stops before sections such as References or See also.
+- **Browser pages.** The browser's own pages and the add-on stores don't allow the on-page buttons or following along. It reads just the selected text there; stop it from the icon.
 - **Backup voice.** If the natural voice ever fails to start, it uses your computer's built-in voice instead.
 
 ## For whoever maintains it

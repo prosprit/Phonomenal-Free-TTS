@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Phonomenal Free TTS",
   "short_name": "Phonomenal",
-  "version": "0.3.2",
-  "description": "Select text, right-click, choose “Read aloud”, or read whole PDFs with the page highlighted. A natural voice that runs on your own computer: free, private, works offline.",
+  "version": "0.4.0",
+  "description": "Select text, right-click, choose “Read aloud from here”: it reads on down the page or PDF, highlighting as it goes. Natural voice, free, private, offline.",
   "minimum_chrome_version": "121",
   "permissions": [
     "contextMenus",

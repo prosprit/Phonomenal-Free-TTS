@@ -3,6 +3,7 @@
 (() => {
   if (window.__readAloudPill) { window.__readAloudPill.show(); return; }
   const host = document.createElement("div");
+  host.id = "phonomenal-pill";
   host.style.cssText = "all:initial;position:fixed;right:20px;bottom:20px;z-index:2147483647;";
   const root = host.attachShadow({ mode: "closed" });
   root.innerHTML = `
