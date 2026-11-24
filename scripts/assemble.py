@@ -24,12 +24,14 @@ for f in ["index.js", "worker.js", "fetch.js", "hub.js", "wav.js", "device.js", 
 for d in ["gpu", "wasm", "wasm-threads"]:
     shutil.copytree(NPM / d, vendor / d, ignore=shutil.ignore_patterns("*.d.ts"))
 
-# 1b. PDF.js for the PDF reader (Apache-2.0): core, worker, standard fonts, image decoders
+# 1b. PDF.js for the PDF reader (Apache-2.0): core, worker, standard fonts, image decoders.
+# The legacy build: the modern one needs the newest browser built-ins (e.g. Uint8Array.toHex, Chrome 140+)
+# and fails to open any PDF on browsers that older Macs are stuck on (Chrome 138 on macOS 11).
 PDFJS = NPM.parent / "pdfjs-dist"
 pj = EXT / "vendor" / "pdfjs"
 if pj.exists(): shutil.rmtree(pj)
 pj.mkdir(parents=True)
-for f in ["build/pdf.min.mjs", "build/pdf.worker.min.mjs", "LICENSE"]:
+for f in ["legacy/build/pdf.min.mjs", "legacy/build/pdf.worker.min.mjs", "LICENSE"]:
     shutil.copy2(PDFJS / f, pj / Path(f).name)
 for d in ["standard_fonts", "wasm"]:
     shutil.copytree(PDFJS / d, pj / d)

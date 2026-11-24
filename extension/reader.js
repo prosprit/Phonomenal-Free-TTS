@@ -115,7 +115,8 @@ async function openData(data, name) {
   } catch (e) {
     progress(null);
     return showPanel(e?.name === "PasswordException" ? "This PDF is password-protected" : "This file couldn't be opened as a PDF",
-      e?.name === "PasswordException" ? "Open it in your browser's PDF viewer instead." : "Check that it is a PDF and try again.");
+      e?.name === "PasswordException" ? "Open it in your browser's PDF viewer instead." : "Check that it is a PDF and try again.",
+      { note: e?.name === "PasswordException" ? "" : `Details: ${e?.message || e}` });
   }
   numPages = pdf.numPages;
   docKey = "pos:" + (pdf.fingerprints?.[0] || name);
