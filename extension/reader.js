@@ -507,7 +507,7 @@ document.addEventListener("keydown", (e) => {
 // ---------- small helpers ----------
 let toastTimer = 0;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 6000); }
-function progress(f) { const el = $("progress"); el.hidden = f === null; if (f !== null) el.firstElementChild.style.width = Math.round(f * 100) + "%"; }
+function progress(f) { const el = $("progress"); el.hidden = f === null; if (f !== null) el.firstElementChild.style.transform = `scaleX(${Math.min(1, Math.max(0, f)).toFixed(3)})`; }
 
 // test/diagnostic hook
 globalThis.__reader = { engine, flow, getParas, start, pages: () => pages, current: () => current, state: () => engine.state, find: findText };

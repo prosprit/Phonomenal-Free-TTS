@@ -43,8 +43,9 @@ In Firefox the voice uses one processor core instead of three. It still reads ab
 | Keep going | When it finishes, press **Continue reading** (just below the text). It reads on to the end of the article and scrolls with it |
 | Jump to another part | While it keeps going, click any sentence. Or select some words and press **Read from here** |
 | Stop | Click the red **Stop** at the bottom-right of the page, or press **Esc** |
+| Something went wrong | Press **Try again** on the same bar |
 | Pause | **Pause** on the same bar, then **Resume** |
-| Use the keyboard | Select text, then press **Alt+Shift+R** (Mac: **Option+Shift+R**). Press it again to stop |
+| Use the keyboard | Select text, then press **Alt+Shift+R** (Mac: **Option+Shift+R**). Press it again to stop. When **Continue reading** shows, the same keys keep going |
 | Change voice or speed | Click the Phonomenal icon. Pick a voice (6 men, 5 women) and Slower, Normal or Faster, then click **Hear this voice** |
 
 ## Read a whole PDF

@@ -16,7 +16,7 @@
   </div>
 
   <div class="transport">
-    <button class="ib" id="prev" type="button" aria-label="Previous sentence" title="Previous sentence (Shift+←)" disabled>
+    <button class="ib" id="prev" type="button" aria-label="Previous sentence" data-tip="Previous sentence" data-kbd="Shift+←" aria-keyshortcuts="Shift+ArrowLeft" disabled>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
     </button>
     <button class="btn primary play" id="play" type="button" disabled>
@@ -24,10 +24,10 @@
       <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
       <span id="playLabel">Read from page 1</span>
     </button>
-    <button class="ib" id="next" type="button" aria-label="Next sentence" title="Next sentence (Shift+→)" disabled>
+    <button class="ib" id="next" type="button" aria-label="Next sentence" data-tip="Next sentence" data-kbd="Shift+→" aria-keyshortcuts="Shift+ArrowRight" disabled>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
     </button>
-    <button class="ib stopb" id="stop" type="button" aria-label="Stop reading" title="Stop (Esc)" disabled>
+    <button class="ib stopb" id="stop" type="button" aria-label="Stop reading" data-tip="Stop" data-kbd="Esc" aria-keyshortcuts="Escape" disabled>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>
     </button>
   </div>
@@ -35,14 +35,14 @@
   <div class="tools">
     <label class="pg">Page <input id="pageIn" type="text" inputmode="numeric" aria-label="Go to page" value="–"> <span>of <span id="pageCount">–</span></span></label>
     <div class="zoom">
-      <button class="ib sm" id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out (Ctrl −)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z"/></svg></button>
+      <button class="ib sm" id="zoomOut" type="button" aria-label="Zoom out" data-tip="Zoom out" data-kbd="Ctrl −"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z"/></svg></button>
       <span id="zoomVal" class="zv">100%</span>
-      <button class="ib sm" id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in (Ctrl +)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
+      <button class="ib sm" id="zoomIn" type="button" aria-label="Zoom in" data-tip="Zoom in" data-kbd="Ctrl +"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
     </div>
-    <select id="voice" aria-label="Voice" title="Voice"></select>
-    <select id="speed" aria-label="Reading speed" title="Speed"></select>
+    <label class="fld"><span>Voice</span> <select id="voice" aria-label="Voice"></select></label>
+    <select id="speed" aria-label="Reading speed"></select>
     <div class="more">
-      <button class="ib" id="moreBtn" type="button" aria-label="Reading options" aria-expanded="false" aria-controls="menu" title="Reading options">
+      <button class="ib tip-end" id="moreBtn" type="button" aria-label="Reading options" aria-expanded="false" aria-controls="menu" data-tip="Reading options">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8.4 4.6.1-1.1-.1-1.1 2.1-1.6-2-3.5-2.5 1a8 8 0 0 0-1.9-1.1L15.7 3h-4l-.4 2.7a8 8 0 0 0-1.9 1.1l-2.5-1-2 3.5L7 10.9l-.1 1.1.1 1.1-2.1 1.6 2 3.5 2.5-1c.6.5 1.2.8 1.9 1.1l.4 2.7h4l.4-2.7c.7-.3 1.3-.6 1.9-1.1l2.5 1 2-3.5z"/></svg>
       </button>
       <div class="menu" id="menu" hidden>

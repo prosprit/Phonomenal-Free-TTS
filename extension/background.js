@@ -80,11 +80,14 @@ async function begin(tabId, text, run) {
   notifyTab("loading");
 }
 
+let lastRead = null;     // what was last asked for, so the pill's "Try again" can repeat it after an error
+
 /** Speak one piece of text (the popup's sample, the welcome page, text the page reader can't follow). */
 export async function readText(text, tabId) {
   text = cleanText(text);
   if (!text) return { ok: false, reason: "empty" };
   tabId = tabIdOf({ id: tabId });
+  lastRead = { text, tabId };
   const s = await settings();
   await begin(tabId, text, null);
   await toPlayer({ type: "speak", text, voice: s.voice, speed: s.speed });
@@ -96,6 +99,7 @@ export async function readSeq(items, run, tabId) {
   items = (items || []).map((it) => ({ text: cleanText(it.text), pause: Math.min(1, Math.max(0, +it.pause || 0.12)) })).filter((it) => it.text);
   if (!items.length) return { ok: false, reason: "empty" };
   tabId = tabIdOf({ id: tabId });
+  lastRead = { items, run, tabId };
   const s = await settings();
   await begin(tabId, items.map((it) => it.text).join(" "), String(run));
   await toPlayer({ type: "speak-seq", items, voice: s.voice, speed: s.speed });
@@ -216,6 +220,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "stop") stopReading();
     if (msg.action === "pause" && session && !session.usingFallback) toPlayer({ type: "pause" });
     if (msg.action === "resume" && session && !session.usingFallback) toPlayer({ type: "resume" });
+    if (msg.action === "retry" && lastRead && !session) {
+      if (lastRead.items) readSeq(lastRead.items, lastRead.run, lastRead.tabId); else readText(lastRead.text, lastRead.tabId);
+    }
     if (msg.action === "read") readText(msg.text, msg.tabId ?? sender.tab?.id ?? null);
     if (msg.action === "read-seq") readSeq(msg.items, msg.run, sender.tab?.id ?? null);   // a jump within the page being read
     if (msg.action === "warm") settings().then((s) => toPlayer({ type: "warm", speed: s.speed }));
@@ -248,4 +255,4 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 // Test hook (used by the Chrome end-to-end test; harmless otherwise).
-self.__readAloud = { readText, readSeq, readFromPage, onMenuClick, stopReading, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };
+self.__readAloud = { readText, readSeq, readFromPage, onMenuClick, stopReading, onPlayerState, log, session: () => session, ensureOffscreen, offscreenStats: () => toPlayer({ type: "stats" }), SPEEDS };

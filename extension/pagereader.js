@@ -18,7 +18,7 @@
   const ABBREV = /\b(e\.g|i\.e|etc|vs|Dr|Mr|Mrs|Ms|St|Fig|No|approx|cf|al)\.$/i;
   const HL = typeof CSS !== "undefined" && CSS.highlights && typeof Highlight === "function";
 
-  let run = null, items = [], active = false, playing = false, lastUserScroll = 0, autoScrollUntil = 0, chip = null;
+  let run = null, items = [], active = false, playing = false, lastUserScroll = 0, autoScrollUntil = 0, chip = null, pending = null;
 
   // ---------- what to read ----------
   const styleCache = new WeakMap();
@@ -155,7 +155,7 @@
     if (!HL || document.getElementById("phonomenal-hl-style")) return;
     const st = document.createElement("style");
     st.id = "phonomenal-hl-style";
-    st.textContent = "::highlight(phonomenal){background-color:rgb(255 204 0 / .45)}";
+    st.textContent = "::highlight(phonomenal){background-color:#ffe066;color:#1a1a1a}";
     (document.head || document.documentElement).appendChild(st);
   }
   function rangeOf(it) {
@@ -215,7 +215,8 @@
     if (!last || !contPoint?.node?.isConnected) return;
     const rest = plan(contPoint.node, contPoint.offset, false);
     if (!rest.length) return;                            // that was the end of the article
-    showChip(last, "Continue reading", () => jump(begin(rest, "continuous")));
+    showChip(last, "Continue reading", () => jump(begin(rest, "continuous")), rangeOf(rest[0]));
+    pending = rest;                                      // the keyboard shortcut (with nothing selected) also continues
   }
 
   // ---------- reading on: click a sentence to jump, or select words and press "Read from here" ----------
@@ -231,7 +232,8 @@
     setTimeout(() => {
       const sel = getSelection();
       if (sel && !sel.isCollapsed && sel.toString().trim()) {
-        return showChip(sel.getRangeAt(0), "Read from here", () => { jump(fromSelection(true)); getSelection()?.removeAllRanges(); });
+        const r = sel.getRangeAt(0);
+        return showChip(r, "Read from here", () => { jump(fromSelection(true)); getSelection()?.removeAllRanges(); }, nextChar(r.endContainer, r.endOffset));
       }
       if (!playing || e.target.closest?.(INTERACTIVE) || e.target.closest?.(SKIP)) return;
       const c = caretAt(e.clientX, e.clientY);
@@ -239,34 +241,62 @@
     }, 0);
   }, true);
 
-  // A small button just below the end of `range`. It sits in the page (absolute), so it scrolls with the text.
-  function showChip(range, label, onClick) {
+  // The first visible character at or after (node, offset), as a range: tells whether text carries on along the same line.
+  function nextChar(node, offset) {
+    if (!node) return null;
+    const w = document.createTreeWalker(document.body || document.documentElement, NodeFilter.SHOW_TEXT);
+    let n = node.nodeType === 3 ? node : null, o = offset;
+    if (!n) { w.currentNode = node.childNodes[offset] || node; n = w.nextNode(); o = 0; } else w.currentNode = n;
+    for (let seen = 0; n && seen < 400; n = w.nextNode(), o = 0) {
+      for (let i = o; i < n.data.length; i++, seen++) {
+        if (/\S/.test(n.data[i])) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1); return r; }
+      }
+    }
+    return null;
+  }
+
+  // A small button at the end of `range`. It never covers the text that comes next: after the last word when the line
+  // ends there and it fits, otherwise just above the last line (over words already read). It sits in the page
+  // (absolute), so it scrolls with the text.
+  function showChip(range, label, onClick, next = null) {
     hideChip();
-    const rect = [...range.getClientRects()].pop() || range.getBoundingClientRect();
+    const last = [...range.getClientRects()].filter((r) => r.width > 0).pop() || range.getBoundingClientRect();
     const host = document.createElement("div");
     host.id = "phonomenal-chip";
-    const left = Math.min(Math.max(8, rect.right - 80), document.documentElement.clientWidth - 220) + scrollX;
-    host.style.cssText = `all:initial;position:absolute;z-index:2147483647;left:${left}px;top:${rect.bottom + scrollY + 8}px;`;
+    host.style.cssText = "all:initial;position:absolute;z-index:2147483647;left:0;top:0;visibility:hidden;";
     const root = host.attachShadow({ mode: "closed" });
-    root.innerHTML = `<style>button{font:700 16px/1 system-ui,-apple-system,"Segoe UI",sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:44px;
-      padding:0 18px 0 14px;border:0;border-radius:999px;background:#2f5d8a;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
-      button:hover{background:#264d73} button:focus-visible{outline:3px solid #1d2733;outline-offset:2px} svg{width:18px;height:18px;fill:currentColor}
-      @media (prefers-reduced-motion:no-preference){button{animation:in .16s ease-out}} @keyframes in{from{opacity:0;transform:translateY(-4px)}}</style>
+    root.innerHTML = `<style>button{font:600 16px/1 system-ui,-apple-system,"Segoe UI",sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:44px;
+      padding:0 18px 0 14px;border:1px solid rgb(255 255 255 / .28);border-radius:999px;background:#2f5d8a;color:#fff;cursor:pointer;
+      box-shadow:0 1px 2px rgb(0 0 0 / .06),0 4px 12px rgb(0 0 0 / .08)}
+      button:hover{background:#264d73} button:active{transform:scale(.97)} button:focus-visible{outline:3px solid #1d2733;outline-offset:2px;box-shadow:0 0 0 2px #fff}
+      svg{width:18px;height:18px;fill:currentColor}
+      @media (prefers-reduced-motion:no-preference){button{animation:in 150ms ease-out}} @keyframes in{from{opacity:0;transform:translateY(2px)}}</style>
       <button type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>`;
     const btn = root.querySelector("button");
     btn.append(label);
     btn.onclick = () => { hideChip(); onClick(); };
     document.documentElement.appendChild(host);
+    const w = btn.offsetWidth, h = btn.offsetHeight, vw = document.documentElement.clientWidth;
+    const n = next?.getClientRects()[0];
+    const lineGoesOn = n && Math.abs(n.top - last.top) < last.height / 2 && n.left >= last.right - 1;
+    let x, y;
+    if (!lineGoesOn && last.right + 10 + w <= vw - 8) { x = last.right + 10; y = Math.max(last.top + (last.height - h) / 2, last.top - 4); }
+    else {
+      x = Math.min(Math.max(8, last.right - w), vw - w - 8);
+      y = last.top - h - 6 >= 8 ? last.top - h - 6 : last.bottom + 6;
+    }
+    host.style.left = `${x + scrollX}px`; host.style.top = `${y + scrollY}px`; host.style.visibility = "visible";
     chip = host;
   }
-  function hideChip() { chip?.remove(); chip = null; }
+  function hideChip() { chip?.remove(); chip = null; pending = null; }
   addEventListener("keydown", (e) => { if (e.key === "Escape") hideChip(); }, true);
 
   // ---------- messages from the background ----------
   chrome.runtime.onMessage.addListener((m, _sender, reply) => {
     if (m?.type === "phonomenal-read-selection") {
-      const res = fromSelection();
+      let res = fromSelection();
       if (res) getSelection()?.removeAllRanges();      // so the reading highlight isn't hidden under the selection
+      else if (pending) res = begin(pending, "continuous");   // nothing selected while "Continue reading" is offered
       reply(res); return;
     }
     if (m?.type === "read-aloud-sentence" && m.run === run) highlight(m.index);
@@ -278,6 +308,7 @@
         if (offer) offerContinue();
       }
       else if (m.run != null && m.run !== run) { active = false; clearHighlight(); }     // another tab or text took over
+      else if (m.run === run && run) active = true;                                    // "Try again" after an error
     }
   });
 

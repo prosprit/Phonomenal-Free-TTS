@@ -3,7 +3,8 @@
 * { box-sizing:border-box; }
 [hidden] { display:none !important; }
 body { margin:0; font:15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
-b { font-weight:650; }
+b { font-weight:600; }
+h1 { font-weight:600; line-height:1.2; }
 kbd { font:600 12px system-ui, sans-serif; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 5px; }
 
 .head { display:flex; gap:10px; align-items:center; }
@@ -21,7 +22,7 @@ h1 { font-size:18px; margin:0; letter-spacing:-.01em; }
 /* popup */
 body.popup { width:320px; padding:14px; }
 fieldset { border:0; padding:0; margin:14px 0 0; min-width:0; }
-legend { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:0; margin-bottom:6px; }
+legend { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:0; margin-bottom:6px; }
 .vgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .col > div { display:flex; flex-direction:column; gap:4px; }
 h3 { font-size:13px; font-weight:600; color:var(--muted); margin:0 0 4px 2px; }
