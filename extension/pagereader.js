@@ -49,8 +49,8 @@
     });
   }
 
-  /** Blocks of text from (node, offset) to the end of the article: [{el, text, nodes, ni, off}] */
-  function collect(node, offset) {
+  /** Blocks of text from (node, offset) to the end of the article, or to `until` (a collapsed Range): [{el, text, nodes, ni, off}] */
+  function collect(node, offset, until = null) {
     if (node.nodeType !== 3) {            // an element position: start at the first text inside or after it
       const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       tw.currentNode = node.childNodes[offset] || node;
@@ -72,6 +72,8 @@
     };
     for (let n = node, first = true; n; n = tw.nextNode(), first = false) {
       if (n.nodeType === 1) { if (cur && !cur.text.endsWith(" ")) { cur.text += " "; cur.ni.push(cur.nodes.length - 1); cur.off.push(0); } continue; }
+      if (until && until.comparePoint(n, 0) > 0) break;                     // past the end of the selection
+      const lim = until && n === until.startContainer ? until.startOffset : n.data.length;
       const el = blockOf(n);
       if (!n.data.trim()) {                   // only spaces: a word gap inside the current block, never a block of its own
         if (cur?.el === el && cur.text && !cur.text.endsWith(" ")) { cur.nodes.push(n); cur.text += " "; cur.ni.push(cur.nodes.length - 1); cur.off.push(0); }
@@ -86,11 +88,12 @@
       }
       cur.nodes.push(n);
       const k = cur.nodes.length - 1, s = n.data;
-      for (let i = first ? offset : 0; i < s.length; i++) {
+      for (let i = first ? offset : 0; i < lim; i++) {
         const ws = /\s/.test(s[i]);
         if (ws && (!cur.text || cur.text.endsWith(" "))) continue;
         cur.text += ws ? " " : s[i]; cur.ni.push(k); cur.off.push(i);
       }
+      if (until && n === until.startContainer) break;
     }
     finish();
     return blocks;
@@ -124,9 +127,10 @@
     }).filter((s) => s.end > s.start && /[\p{L}\p{N}]/u.test(text.slice(s.start, s.end)));
   }
 
-  /** Utterances from a spot in the page. wholeSentence: start at the beginning of the sentence containing it. */
-  function plan(node, offset, wholeSentence) {
-    let blocks = collect(node, offset);
+  /** Utterances from a spot in the page (to `until`, or the end of the article).
+   *  wholeSentence: start at the beginning of the sentence containing the spot. */
+  function plan(node, offset, wholeSentence, until = null) {
+    let blocks = collect(node, offset, until);
     if (wholeSentence && node.nodeType === 3 && blocks.length) {   // re-collect from the start of the clicked sentence
       const all = collect(blocks[0].el, 0), full = all[0];
       if (full && full.el === blocks[0].el) {
@@ -180,58 +184,82 @@
   addEventListener("keydown", (e) => { if (/^(PageUp|PageDown|ArrowUp|ArrowDown|Home|End| )$/.test(e.key)) lastUserScroll = Date.now(); }, true);
 
   // ---------- starting ----------
-  function start(node, offset, wholeSentence) {
-    const its = plan(node, offset, wholeSentence);
+  // Two modes. "selection": read just what you selected, then offer "Continue reading" (nothing reads on
+  // unless you ask). "continuous": read on to the end of the article; a click on a sentence jumps there.
+  let mode = "selection", contPoint = null;
+  function begin(its, m, cont = null) {
     if (!its.length) return null;
-    items = its; run = Math.random().toString(36).slice(2); active = true; hideChip(); clearHighlight();   // unique across frames
+    items = its; mode = m; contPoint = cont;
+    run = Math.random().toString(36).slice(2);          // unique across frames
+    active = true; hideChip(); clearHighlight();
     return { run, items: items.map(({ text, pause }) => ({ text, pause })) };
   }
-  function fromSelection() {
+  const start = (node, offset, wholeSentence) => begin(plan(node, offset, wholeSentence), "continuous");
+  function fromSelection(onward = false) {
     const sel = getSelection();
     if (!sel || sel.isCollapsed || !sel.rangeCount || !sel.toString().trim()) return null;
     const r = sel.getRangeAt(0);
     let node = r.startContainer, offset = r.startOffset;
     if (node.nodeType === 3) { while (offset > 0 && /\S/.test(node.data[offset - 1])) offset--; }   // whole first word
-    return start(node, offset, false);
+    if (onward) return start(node, offset, false);
+    let en = r.endContainer, eo = r.endOffset;
+    if (en.nodeType === 3) { while (eo > 0 && eo < en.data.length && /\S/.test(en.data[eo - 1]) && /\S/.test(en.data[eo])) eo++; }   // whole last word
+    const until = document.createRange(); until.setStart(en, eo); until.collapse(true);
+    return begin(plan(node, offset, false, until), "selection", { node: en, offset: eo });
   }
   function jump(res) { if (res) chrome.runtime.sendMessage({ type: "control", action: "read-seq", ...res }).catch(() => {}); }
 
-  // ---------- while reading: click a sentence to jump, or select words and press "Read from here" ----------
+  // after reading a selection: a small "Continue reading" button right where it stopped
+  function offerContinue() {
+    const last = items.length && rangeOf(items[items.length - 1]);
+    if (!last || !contPoint?.node?.isConnected) return;
+    const rest = plan(contPoint.node, contPoint.offset, false);
+    if (!rest.length) return;                            // that was the end of the article
+    showChip(last, "Continue reading", () => jump(begin(rest, "continuous")));
+  }
+
+  // ---------- reading on: click a sentence to jump, or select words and press "Read from here" ----------
   const INTERACTIVE = "a[href],button,input,select,textarea,label,summary,video,audio,[contenteditable=''],[contenteditable=true],[role=button],[role=link],[role=tab],[role=menuitem],[onclick]";
   function caretAt(x, y) {
     if (document.caretPositionFromPoint) { const p = document.caretPositionFromPoint(x, y); return p && { node: p.offsetNode, offset: p.offset }; }
     if (document.caretRangeFromPoint) { const r = document.caretRangeFromPoint(x, y); return r && { node: r.startContainer, offset: r.startOffset }; }
     return null;
   }
+  addEventListener("pointerdown", (e) => { if (chip && e.target !== chip) hideChip(); }, true);   // a click elsewhere dismisses it
   addEventListener("pointerup", (e) => {
-    if (!active || e.button !== 0 || /^phonomenal-/.test(e.target?.id || "")) return;   // our pill and chip
+    if (!active || mode !== "continuous" || e.button !== 0 || /^phonomenal-/.test(e.target?.id || "")) return;   // our pill and chip
     setTimeout(() => {
       const sel = getSelection();
-      if (sel && !sel.isCollapsed && sel.toString().trim()) return showChip(sel.getRangeAt(0));
-      hideChip();
+      if (sel && !sel.isCollapsed && sel.toString().trim()) {
+        return showChip(sel.getRangeAt(0), "Read from here", () => { jump(fromSelection(true)); getSelection()?.removeAllRanges(); });
+      }
       if (!playing || e.target.closest?.(INTERACTIVE) || e.target.closest?.(SKIP)) return;
       const c = caretAt(e.clientX, e.clientY);
       if (c?.node?.nodeType === 3 && c.node.data.trim()) jump(start(c.node, c.offset, true));
     }, 0);
   }, true);
 
-  function showChip(range) {
+  // A small button just below the end of `range`. It sits in the page (absolute), so it scrolls with the text.
+  function showChip(range, label, onClick) {
     hideChip();
     const rect = [...range.getClientRects()].pop() || range.getBoundingClientRect();
     const host = document.createElement("div");
     host.id = "phonomenal-chip";
-    host.style.cssText = `all:initial;position:fixed;z-index:2147483647;left:${Math.min(Math.max(8, rect.right - 70), innerWidth - 190)}px;top:${Math.min(rect.bottom + 10, innerHeight - 60)}px;`;
+    const left = Math.min(Math.max(8, rect.right - 80), document.documentElement.clientWidth - 220) + scrollX;
+    host.style.cssText = `all:initial;position:absolute;z-index:2147483647;left:${left}px;top:${rect.bottom + scrollY + 8}px;`;
     const root = host.attachShadow({ mode: "closed" });
     root.innerHTML = `<style>button{font:700 16px/1 system-ui,-apple-system,"Segoe UI",sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:44px;
       padding:0 18px 0 14px;border:0;border-radius:999px;background:#2f5d8a;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
-      button:focus-visible{outline:3px solid #1d2733;outline-offset:2px} svg{width:18px;height:18px;fill:currentColor}</style>
-      <button type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Read from here</button>`;
-    root.querySelector("button").onclick = () => { jump(fromSelection()); getSelection()?.removeAllRanges(); };
+      button:hover{background:#264d73} button:focus-visible{outline:3px solid #1d2733;outline-offset:2px} svg{width:18px;height:18px;fill:currentColor}
+      @media (prefers-reduced-motion:no-preference){button{animation:in .16s ease-out}} @keyframes in{from{opacity:0;transform:translateY(-4px)}}</style>
+      <button type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>`;
+    const btn = root.querySelector("button");
+    btn.append(label);
+    btn.onclick = () => { hideChip(); onClick(); };
     document.documentElement.appendChild(host);
     chip = host;
   }
   function hideChip() { chip?.remove(); chip = null; }
-  addEventListener("scroll", () => { if (chip && Date.now() > autoScrollUntil) hideChip(); }, { passive: true, capture: true });
   addEventListener("keydown", (e) => { if (e.key === "Escape") hideChip(); }, true);
 
   // ---------- messages from the background ----------
@@ -244,10 +272,14 @@
     if (m?.type === "read-aloud-sentence" && m.run === run) highlight(m.index);
     if (m?.type === "read-aloud-state") {
       playing = m.state === "speaking";
-      if (["done", "stopped", "error"].includes(m.state)) { active = false; playing = false; clearHighlight(); hideChip(); }
+      if (["done", "stopped", "error"].includes(m.state)) {
+        const offer = m.state === "done" && m.run === run && mode === "selection";
+        active = false; playing = false; clearHighlight(); hideChip();
+        if (offer) offerContinue();
+      }
       else if (m.run != null && m.run !== run) { active = false; clearHighlight(); }     // another tab or text took over
     }
   });
 
-  window.__phonPage = { fromSelection, plan, items: () => items, run: () => run, active: () => active };   // used by tests
+  window.__phonPage = { fromSelection, plan, items: () => items, run: () => run, active: () => active, mode: () => mode };   // used by tests
 })();

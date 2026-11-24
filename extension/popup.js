@@ -1,7 +1,7 @@
 import { VOICES, SPEEDS, DEFAULTS } from "./voices.js";
 
 const $ = (id) => document.getElementById(id);
-const SAMPLE = "Hello! This is how I will sound when I read to you. Select any text on a page, right-click, and choose Read aloud from here.";
+const SAMPLE = "Hello! This is how I will sound when I read to you. Select any text on a page, right-click, and choose Read aloud.";
 const s = { ...DEFAULTS, ...(await chrome.storage.sync.get(["voice", "speed"])) };
 const control = (action, extra) => chrome.runtime.sendMessage({ type: "control", action, ...extra });
 

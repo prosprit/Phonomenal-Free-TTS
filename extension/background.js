@@ -102,7 +102,8 @@ export async function readSeq(items, run, tabId) {
   return { ok: true };
 }
 
-/** "Read aloud from here": read onward from the selection in that frame. False if the page can't be followed. */
+/** "Read aloud" on a web page: read the selection in that frame, highlighting as it goes; the page then offers
+ *  "Continue reading" (pagereader.js). False if the page can't be followed. */
 export async function readFromPage(tabId, frameId = 0) {
   if (tabId == null) return false;
   try {
@@ -174,7 +175,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
   chrome.contextMenus.removeAll(() => {
     // One item per situation, so the browser shows it directly instead of under a "Phonomenal" submenu
     // (Chrome nests an extension's items as soon as more than one matches, hidden ones included).
-    chrome.contextMenus.create({ id: "read-aloud", title: "Read aloud from here", contexts: ["selection"] });
+    chrome.contextMenus.create({ id: "read-aloud", title: "Read aloud", contexts: ["selection"] });
     chrome.contextMenus.create({ id: "pdf-open", title: "Read this PDF aloud", contexts: ["page"], documentUrlPatterns: PDF_PATTERNS });
   });
   if (reason === "install") chrome.tabs.create({ url: "welcome.html" });
@@ -187,12 +188,11 @@ export async function onMenuClick(info, tab) {
   const url = info.pageUrl || real.url || "";
   const id = tabIdOf(real);
   if (info.menuItemId === "read-aloud") {
-    // a PDF: the reader opens at the selected words and reads on through the document
-    if (isPdfUrl(url)) return openReader({ id, url }, info.selectionText || "");
-    // a web page: read on from the selection, following along on the page
-    if (tabIdOf(tab) != null && await readFromPage(id, info.frameId ?? 0)) return;
-    // pages that can't be followed (browser pages, text boxes): just read the selected text
+    // a web page: read the selection with highlighting, then offer "Continue reading" on the page
+    if (!isPdfUrl(url) && tabIdOf(tab) != null && await readFromPage(id, info.frameId ?? 0)) return;
+    // the browser's PDF viewer and pages that can't be followed (browser pages, text boxes): read the selected text
     if ((info.selectionText || "").trim()) return readText(info.selectionText, id);
+    if (isPdfUrl(url)) return openReader({ id, url });   // the PDF viewer gave no text: use the reader
   }
   if (info.menuItemId === "pdf-open") return openReader({ id, url });
 }
@@ -203,7 +203,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   if (session) return stopReading();
   if (tabIdOf(tab) == null) return;
   if (isPdfUrl(tab.url)) return openReader(tab);       // the browser's PDF viewer can't be read from: open the reader
-  if (await readFromPage(tab.id, 0)) return;           // read on from the selection
+  if (await readFromPage(tab.id, 0)) return;           // the selection, then "Continue reading"
   try {
     const [{ result }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => String(getSelection() || "") });
     if (result.trim()) readText(result, tab.id);

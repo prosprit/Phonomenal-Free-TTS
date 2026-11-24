@@ -3,7 +3,7 @@
   "name": "Phonomenal Free TTS",
   "short_name": "Phonomenal",
   "version": "0.4.0",
-  "description": "Select text, right-click, choose “Read aloud from here”: it reads on down the page or PDF, highlighting as it goes. Natural voice, free, private, offline.",
+  "description": "Select text, right-click, choose “Read aloud”. Keep going down the page, or read whole PDFs, with highlighting. Natural voice, free, private, offline.",
   "minimum_chrome_version": "121",
   "permissions": [
     "contextMenus",
