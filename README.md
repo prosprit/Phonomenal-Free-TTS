@@ -12,7 +12,7 @@ Select text on any web page, right-click, choose **Read aloud**, and it reads th
 **Download:** get `phonomenal-free-tts-<version>.zip` from the [latest release](https://github.com/prosprit/Phonomenal-Free-TTS/releases/latest), then follow the steps below. You can also download this repository and use its `extension` folder.
 
 <p>
- <img width="320" height="578" alt="image" src="https://github.com/user-attachments/assets/40ec206c-c46a-4673-be0f-3de82451afdf" />
+ <img width="417" height="512" alt="image" src="https://github.com/user-attachments/assets/e6f789ae-d21e-4d99-a5cc-e2e7fdaef68f" />
  <img width="1540" height="765" alt="image" src="https://github.com/user-attachments/assets/20d1cd19-89dd-4c23-b9d3-dda9f427ad78" />
  <img width="1905" height="946" alt="image" src="https://github.com/user-attachments/assets/abe9d085-1fbf-46ee-bc2f-e9c3aac0e97c" />
 
