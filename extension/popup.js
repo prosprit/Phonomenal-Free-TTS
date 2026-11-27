@@ -26,11 +26,11 @@ for (const l of LANGS) radio($("langs"), "vlang", l.id === shown, l.id, l.name, 
 $("detect").checked = s.lang === "auto";
 $("detect").onchange = () => setLang($("detect").checked ? "auto" : shown);
 function setLang(lang) { s.lang = lang; chrome.storage.sync.set({ lang }); langNote(); }
-// Says what the language row does in each mode; its line is always there, so nothing below moves.
+// With Detect language off, says which language every text is read in. Hidden while detecting.
 function langNote() {
   const fixed = LANGS.find((l) => l.id === s.lang);
-  $("langNote").innerHTML = fixed ? "All text is read in <b></b>." : "Each text is read in its own language.";
-  if (fixed) $("langNote").querySelector("b").textContent = fixed.name;
+  $("langNote").hidden = !fixed;
+  if (fixed) { $("langNote").innerHTML = "All text is read in <b></b>."; $("langNote").querySelector("b").textContent = fixed.name; }
 }
 langNote();
 function showVoices(lang) {
