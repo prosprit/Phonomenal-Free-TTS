@@ -1,32 +1,35 @@
 // The speech player: owns the Phonon model and the audio output, and streams speech as it is generated.
 // Chrome runs it in an offscreen document (offscreen.js); Firefox runs it in the background page itself.
 import { PhononTTS } from "./vendor/phonon-tts/index.js";
-import { SPEEDS, modelSpec } from "./voices.js";
+import { SPEEDS, modelSpec, langOf } from "./voices.js";
 
 const AHEAD_S = 6;   // seconds of audio kept ready ahead when reading a page sentence by sentence
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export function createPlayer(report) {
-  let tts = null, ttsSpeed = null, loading = null;
+  let tts = null, ttsKey = null, loading = null;
   let seq = 0, current = null;
   const stats = { loads: [] };
 
-  async function getTTS(speedId) {
+  // One model instance at a time, loaded for one language (which picks how numbers, dates and symbols are read)
+  // and one pacing. Switching either reloads it, which takes about half a second.
+  async function getTTS(speedId, langId) {
     const delta = (SPEEDS.find((s) => s.id === speedId) || SPEEDS[1]).delta;
-    if (tts && ttsSpeed === delta) return tts;
-    if (loading && loading.delta === delta) return loading.promise;
+    const lang = langOf(langId), key = `${lang}|${delta}`;
+    if (tts && ttsKey === key) return tts;
+    if (loading && loading.key === key) return loading.promise;
     const t0 = performance.now();
     const promise = (async () => {
       if (tts) { tts.dispose(); tts = null; }
       const t = await PhononTTS.load({
-        lang: "en", model: modelSpec(), quant: "q8", cache: false, device: "cpu", threads: "auto",
+        lang, model: modelSpec(), quant: "q8", cache: false, device: "cpu", threads: "auto",
         conditions: { duration_delta: delta },
       });
-      tts = t; ttsSpeed = delta;
-      stats.loads.push({ ms: Math.round(performance.now() - t0), threads: t.threads, threadsReason: t.threadsReason, device: t.device, isolated: self.crossOriginIsolated });
+      tts = t; ttsKey = key;
+      stats.loads.push({ lang, ms: Math.round(performance.now() - t0), threads: t.threads, threadsReason: t.threadsReason, device: t.device, isolated: self.crossOriginIsolated });
       return t;
     })();
-    loading = { delta, promise };
+    loading = { key, promise };
     try { return await promise; } finally { if (loading?.promise === promise) loading = null; }
   }
 
@@ -39,13 +42,13 @@ export function createPlayer(report) {
     report(reason);
   }
 
-  async function speak({ text, voice, speed }) {
+  async function speak({ text, voice, speed, lang }) {
     stop("replaced");
     const id = ++seq;
     const t0 = performance.now();
     report("loading");
     let t;
-    try { t = await getTTS(speed); }
+    try { t = await getTTS(speed, lang); }
     catch (e) { if (id === seq) report("error", { error: String(e?.message || e), phase: "load" }); return; }
     if (id !== seq) return;
 
@@ -80,13 +83,13 @@ export function createPlayer(report) {
 
   // A page read sentence by sentence: synthesizes a few seconds ahead of what you hear and reports
   // report("sentence", {index}) as each one starts being heard, so the page can highlight it.
-  async function speakSeq({ items, voice, speed }) {
+  async function speakSeq({ items, voice, speed, lang }) {
     stop("replaced");
     const id = ++seq;
     const t0 = performance.now();
     report("loading");
     let t;
-    try { t = await getTTS(speed); }
+    try { t = await getTTS(speed, lang); }
     catch (e) { if (id === seq) report("error", { error: String(e?.message || e), phase: "load" }); return; }
     if (id !== seq) return;
 
@@ -140,7 +143,7 @@ export function createPlayer(report) {
       case "stop": stop(); break;
       case "pause": if (current) current.ctx.suspend().then(() => report("paused")); break;
       case "resume": if (current) current.ctx.resume().then(() => report("speaking")); break;
-      case "warm": getTTS(msg.speed).then(() => report("ready")).catch((e) => report("error", { error: String(e), phase: "warm" })); break;
+      case "warm": getTTS(msg.speed, msg.lang).then(() => report("ready")).catch((e) => report("error", { error: String(e), phase: "warm" })); break;
       case "stats": return { ...stats, playing: !!current, ctxState: current?.ctx.state ?? null };
     }
   };

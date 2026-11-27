@@ -1,5 +1,8 @@
-Phonon 31M English (gradium/phonon-31m-en) weights, tokenizer and voices, and the voices from
-gradium/phonon-voices, are released by Gradium under the Apache License 2.0 (see LICENSE-APACHE in
+Model: Phonon 40M multilingual (gradium/phonon-40m-multilingual) by Gradium. Its weights, tokenizer and
+default voice are licensed under Creative Commons Attribution-NonCommercial 4.0 International
+(CC BY-NC 4.0, https://creativecommons.org/licenses/by-nc/4.0/). They are included unchanged and may not
+be used for commercial purposes.
+Voices in voices/: gradium/phonon-voices by Gradium, Apache License 2.0 (see LICENSE-APACHE in
 vendor/phonon-tts). Phonon builds on Pocket TTS and the Mimi codec by Kyutai.
 The phonon-tts browser runtime is licensed MIT OR Apache-2.0.
 Responsible use: do not use these voices to impersonate real people; tell listeners speech is synthetic where it matters.

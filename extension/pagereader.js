@@ -192,7 +192,12 @@
     items = its; mode = m; contPoint = cont;
     run = Math.random().toString(36).slice(2);          // unique across frames
     active = true; hideChip(); clearHighlight();
-    return { run, items: items.map(({ text, pause }) => ({ text, pause })) };
+    return { run, items: items.map(({ text, pause }) => ({ text, pause })), lang: langHint(its[0]) };
+  }
+  // The page's declared language near where reading starts: a hint for short selections the detector can't place.
+  function langHint(it) {
+    const el = it?.b?.el?.nodeType === 1 ? it.b.el : getSelection()?.anchorNode?.parentElement;
+    return (el?.closest?.("[lang]") || document.documentElement).getAttribute("lang") || "";
   }
   const start = (node, offset, wholeSentence) => begin(plan(node, offset, wholeSentence), "continuous");
   function fromSelection(onward = false) {

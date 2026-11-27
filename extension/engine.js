@@ -1,27 +1,28 @@
 // Sentence-by-sentence speech for long documents: synthesizes a few seconds ahead of what you hear, keeps a
 // timeline so the page can highlight the sentence being spoken, and can pause, resume, stop or jump anywhere.
 import { PhononTTS } from "./vendor/phonon-tts/index.js";
-import { SPEEDS, modelSpec } from "./voices.js";
+import { SPEEDS, modelSpec, langOf } from "./voices.js";
 
 const AHEAD_S = 6;   // seconds of audio to keep queued: enough to never stall, small enough to react quickly
 
 export class SpeechEngine {
-  #tts = null; #delta = null; #loading = null;
+  #tts = null; #key = null; #loading = null;
   #seq = 0; #ctx = null; #ac = null; #timeline = []; #tick = null; #current = null;
   state = "idle";                       // idle | loading | playing | paused
   onstate = () => {};                   // (state, info)
   onsentence = () => {};                // (utterance) when it starts being heard
 
-  async load(speedId) {
+  async load(speedId, langId = "en") {
     const delta = (SPEEDS.find((s) => s.id === speedId) || SPEEDS[1]).delta;
-    if (this.#tts && this.#delta === delta) return this.#tts;
-    if (this.#loading?.delta === delta) return this.#loading.promise;
+    const lang = langOf(langId), key = `${lang}|${delta}`;
+    if (this.#tts && this.#key === key) return this.#tts;
+    if (this.#loading?.key === key) return this.#loading.promise;
     const promise = (async () => {
-      const t = await PhononTTS.load({ lang: "en", model: modelSpec(), quant: "q8", cache: false, device: "cpu", threads: "auto", conditions: { duration_delta: delta } });
-      this.#tts?.dispose(); this.#tts = t; this.#delta = delta;
+      const t = await PhononTTS.load({ lang, model: modelSpec(), quant: "q8", cache: false, device: "cpu", threads: "auto", conditions: { duration_delta: delta } });
+      this.#tts?.dispose(); this.#tts = t; this.#key = key;
       return t;
     })();
-    this.#loading = { delta, promise };
+    this.#loading = { key, promise };
     try { return await promise; } finally { if (this.#loading?.promise === promise) this.#loading = null; }
   }
 
@@ -29,12 +30,12 @@ export class SpeechEngine {
   get current() { return this.#current; }
 
   /** Speak utterances ({text, pause, ...}) from an async iterator until it ends or play() is called again. */
-  async play(utterances, { voice, speed }) {
+  async play(utterances, { voice, speed, lang }) {
     this.stop(true);
     const id = ++this.#seq;
     this.#set("loading");
     let t;
-    try { t = await this.load(speed); } catch (e) { if (id === this.#seq) this.#set("error", { error: String(e?.message || e) }); return; }
+    try { t = await this.load(speed, lang); } catch (e) { if (id === this.#seq) this.#set("error", { error: String(e?.message || e) }); return; }
     if (id !== this.#seq) return;
     const ctx = this.#ctx = new AudioContext({ sampleRate: t.sampleRate, latencyHint: "playback" });
     const ac = this.#ac = new AbortController();

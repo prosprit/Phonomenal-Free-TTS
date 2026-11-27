@@ -3,7 +3,7 @@
 import * as pdfjs from "./vendor/pdfjs/pdf.min.mjs";
 import { SpeechEngine } from "./engine.js";
 import { pageParagraphs } from "./pdftext.js";
-import { VOICES, SPEEDS, DEFAULTS } from "./voices.js";
+import { VOICES, SPEEDS, DEFAULTS, LANGS, SETTING_KEYS, voiceKey, voiceFor, pickLang, langOf } from "./voices.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL("vendor/pdfjs/pdf.worker.min.mjs");
 const $ = (id) => document.getElementById(id);
@@ -12,9 +12,10 @@ const params = new URLSearchParams(location.search);
 const IS_FIREFOX = navigator.userAgent.includes("Firefox");
 const END_PUNCT = /[.!?:;”"’)\]]$/;
 const PT = 96 / 72;                                   // CSS px per PDF point: "100%" matches the browser's own viewer
-const KEYS = ["voice", "speed", "pdfFollow", "pdfSideNotes", "pdfSkipHeaders"];
+const KEYS = [...SETTING_KEYS, "pdfFollow", "pdfSideNotes", "pdfSkipHeaders"];
 const S = { ...DEFAULTS, pdfFollow: true, pdfSideNotes: true, pdfSkipHeaders: true, ...(await chrome.storage.sync.get(KEYS)) };
 
+let docLang = S.lang !== "auto" ? langOf(S.lang) : "en", detectedLang = null;   // the language this PDF is read in
 let pdf = null, docKey = null, numPages = 0, base = { w: 612, h: 792 };
 let zoom = 1, currentPage = 1, resumePos = null, current = null, chipPos = null;
 let userScrolled = false, autoScrollUntil = 0;
@@ -25,16 +26,41 @@ const paraReady = new Map();       // page -> paragraphs (resolved), for synchro
 const engine = new SpeechEngine();
 
 // ---------- toolbar setup ----------
-for (const [label, list] of [["Men", VOICES.filter((v) => v.gender === "male")], ["Women", VOICES.filter((v) => v.gender === "female")]]) {
-  const g = document.createElement("optgroup"); g.label = label;
-  for (const v of list) g.append(new Option(v.name, v.id, false, v.id === S.voice));
-  $("voice").append(g);
+// The voice list follows the PDF's language; each language remembers its own voice.
+function fillVoices() {
+  $("voice").replaceChildren();
+  const cur = voiceFor(S, docLang);
+  for (const [label, g2] of [["Men", "male"], ["Women", "female"]]) {
+    const g = document.createElement("optgroup"); g.label = label;
+    for (const v of VOICES[docLang].filter((x) => x.gender === g2)) g.append(new Option(v.name, v.id, false, v.id === cur));
+    $("voice").append(g);
+  }
 }
+function fillLangs() {
+  $("langSel").replaceChildren(new Option(detectedLang ? `Detect (${LANGS.find((l) => l.id === detectedLang).name})` : "Detect automatically", "auto", false, S.lang === "auto"),
+    ...LANGS.map((l) => new Option(l.name, l.id, false, l.id === S.lang)));
+}
+async function detectDocLang() {
+  let text = "";
+  for (let n = 1; n <= Math.min(numPages, 3) && text.length < 3000; n++) {
+    try { text += " " + (await getText(n)).items.map((i) => i.str).join(" "); } catch {}
+  }
+  detectedLang = await pickLang(text, "auto", "");
+  setDocLang();
+}
+function setDocLang() {
+  const next = S.lang !== "auto" ? langOf(S.lang) : (detectedLang || "en");
+  const changed = next !== docLang;
+  docLang = next; fillVoices(); fillLangs();
+  if (changed) restartHere();
+}
+fillVoices(); fillLangs();
 for (const sp of SPEEDS) $("speed").append(new Option(`${sp.label} speed`, sp.id, false, sp.id === S.speed));
 $("optFollow").checked = S.pdfFollow; $("optSide").checked = S.pdfSideNotes; $("optHeaders").checked = S.pdfSkipHeaders;
 const save = (o) => { Object.assign(S, o); chrome.storage.sync.set(o); };
 
-$("voice").onchange = () => { save({ voice: $("voice").value }); restartHere(); };
+$("voice").onchange = () => { save({ [voiceKey(docLang)]: $("voice").value }); restartHere(); };
+$("langSel").onchange = () => { save({ lang: $("langSel").value }); setDocLang(); };
 $("speed").onchange = () => { save({ speed: $("speed").value }); restartHere(); };
 $("optFollow").onchange = () => { save({ pdfFollow: $("optFollow").checked }); if (S.pdfFollow) backToReading(); };
 $("optSide").onchange = () => { save({ pdfSideNotes: $("optSide").checked }); resetText(); };
@@ -132,6 +158,7 @@ async function openData(data, name) {
   ["play", "stop", "prev", "next"].forEach((id) => ($(id).disabled = id !== "play"));
   progress(null);
   chrome.runtime.sendMessage({ type: "control", action: "release" }).catch(() => {});   // free the voice used by the popup
+  detectedLang = null; await detectDocLang();
 
   // where to start: a selection passed from the browser's viewer, or where the reader stopped last time
   const saved = (await chrome.storage.local.get(docKey))[docKey];
@@ -329,7 +356,7 @@ async function start(pos) {
   hideChip();
   resumePos = null; userScrolled = false; $("back").hidden = true;
   await getParas(pos.page);
-  engine.play(flow(pos), { voice: S.voice, speed: S.speed });
+  engine.play(flow(pos), { voice: voiceFor(S, docLang), speed: S.speed, lang: docLang });
   updateUI();
 }
 

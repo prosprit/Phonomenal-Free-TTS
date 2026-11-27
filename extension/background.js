@@ -1,14 +1,25 @@
 // Background: right-click menu, keyboard shortcut, and routing between the page, the popup and the speech
 // player. Chrome: a service worker that drives an offscreen document. Firefox: an event page that runs the
 // player itself. If the Phonon voice cannot start, it falls back to the computer's own voice.
-import { DEFAULTS, SPEEDS } from "./voices.js";
+import { DEFAULTS, SPEEDS, SETTING_KEYS, CODE_VERSION, pickLang, voiceFor, langOf } from "./voices.js";
 
 const USE_OFFSCREEN = !!chrome.offscreen;   // Chrome; Firefox has no offscreen API but its background page can play audio
 let creating = null, inlinePlayer = null;
 let session = null;          // { tabId, text, state, usingFallback }
 const log = [];              // recent states, for diagnostics/tests
 
-async function settings() { return { ...DEFAULTS, ...(await chrome.storage.sync.get(["voice", "speed"])) }; }
+async function settings() { return { ...DEFAULTS, ...(await chrome.storage.sync.get(SETTING_KEYS)) }; }
+const BCP47 = { en: "en-US", es: "es-ES", fr: "fr-FR", de: "de-DE", pt: "pt-BR" };   // for the computer's own voice
+
+// The language last read in, so "warm" (popup opened, settings changed) preloads the model for the likely next read.
+async function lastLang() { try { return langOf((await chrome.storage.local.get("lastLang")).lastLang); } catch { return "en"; } }
+async function warmLang(s) { return s.lang !== "auto" ? langOf(s.lang) : lastLang(); }
+/** Language and voice for this text: the user's fixed choice, or detected from the text and the page. */
+async function voiceSetup(text, s, force, pageLang) {
+  const lang = await pickLang(text, force || s.lang, pageLang);
+  chrome.storage.local.set({ lastLang: lang }).catch(() => {});
+  return { lang, voice: voiceFor(s, lang) };
+}
 
 async function ensureOffscreen() {
   const contexts = await chrome.runtime.getContexts({ contextTypes: ["OFFSCREEN_DOCUMENT"] });
@@ -73,7 +84,7 @@ const within = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(() => r
 async function begin(tabId, text, run) {
   stopFallback();
   if (session && session.tabId !== tabId) notifyTab("stopped");     // clear the controls and highlight in the old tab
-  session = { tabId, text, run, state: "loading", usingFallback: false, started: Date.now() };
+  session = { tabId, text, run, lang: "en", state: "loading", usingFallback: false, started: Date.now() };
   setBadge("loading");
   // on-page controls are a nicety: if the page refuses them (PDF viewer, browser pages), speak anyway
   if (tabId != null) await within(showPill(tabId), 1500);
@@ -82,28 +93,34 @@ async function begin(tabId, text, run) {
 
 let lastRead = null;     // what was last asked for, so the pill's "Try again" can repeat it after an error
 
-/** Speak one piece of text (the popup's sample, the welcome page, text the page reader can't follow). */
-export async function readText(text, tabId) {
+/** Speak one piece of text (the popup's sample, the welcome page, text the page reader can't follow).
+ *  `lang` forces a language (the popup's voice sample); otherwise it follows the settings / detection. */
+export async function readText(text, tabId, { lang: force = null, pageLang = "" } = {}) {
   text = cleanText(text);
   if (!text) return { ok: false, reason: "empty" };
   tabId = tabIdOf({ id: tabId });
-  lastRead = { text, tabId };
+  lastRead = { text, tabId, force, pageLang };
   const s = await settings();
-  await begin(tabId, text, null);
-  await toPlayer({ type: "speak", text, voice: s.voice, speed: s.speed });
-  return { ok: true };
+  await begin(tabId, text, null);                                   // controls first, then the language
+  const { lang, voice } = await voiceSetup(text, s, force, pageLang);
+  if (session) session.lang = lang;
+  await toPlayer({ type: "speak", text, voice, speed: s.speed, lang });
+  return { ok: true, lang, voice };
 }
 
 /** Read a page sentence by sentence from where the user chose (items come from pagereader.js). */
-export async function readSeq(items, run, tabId) {
+export async function readSeq(items, run, tabId, pageLang = "") {
   items = (items || []).map((it) => ({ text: cleanText(it.text), pause: Math.min(1, Math.max(0, +it.pause || 0.12)) })).filter((it) => it.text);
   if (!items.length) return { ok: false, reason: "empty" };
   tabId = tabIdOf({ id: tabId });
-  lastRead = { items, run, tabId };
+  lastRead = { items, run, tabId, pageLang };
   const s = await settings();
-  await begin(tabId, items.map((it) => it.text).join(" "), String(run));
-  await toPlayer({ type: "speak-seq", items, voice: s.voice, speed: s.speed });
-  return { ok: true };
+  const text = items.map((it) => it.text).join(" ");
+  await begin(tabId, text, String(run));
+  const { lang, voice } = await voiceSetup(text, s, null, pageLang);
+  if (session) session.lang = lang;
+  await toPlayer({ type: "speak-seq", items, voice, speed: s.speed, lang });
+  return { ok: true, lang, voice };
 }
 
 /** "Read aloud" on a web page: read the selection in that frame, highlighting as it goes; the page then offers
@@ -115,7 +132,7 @@ export async function readFromPage(tabId, frameId = 0) {
     if (!injected) return false;
     const res = await within(chrome.tabs.sendMessage(tabId, { type: "phonomenal-read-selection" }, { frameId }), 3000);
     if (!res?.items?.length) return false;
-    return (await readSeq(res.items, res.run, tabId)).ok;
+    return (await readSeq(res.items, res.run, tabId, res.lang)).ok;
   } catch { return false; }
 }
 
@@ -148,12 +165,12 @@ async function fallbackSpeak(reason) {
   const end = (kind) => { if (session?.usingFallback) finish(kind); };
   if (chrome.tts) {
     chrome.tts.speak(session.text, {
-      rate, lang: "en-US",
+      rate, lang: BCP47[session.lang] || "en-US",
       onEvent: (e) => { if (["end", "interrupted", "cancelled", "error"].includes(e.type)) end(e.type === "end" ? "done" : e.type === "error" ? "error" : "stopped"); },
     });
   } else if (globalThis.speechSynthesis) {
     const u = new SpeechSynthesisUtterance(session.text);
-    u.rate = rate; u.lang = "en-US";
+    u.rate = rate; u.lang = BCP47[session.lang] || "en-US";
     u.onend = () => end("done"); u.onerror = (e) => end(e.error === "canceled" || e.error === "interrupted" ? "stopped" : "error");
     speechSynthesis.speak(u);
   } else end("error");
@@ -221,11 +238,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "pause" && session && !session.usingFallback) toPlayer({ type: "pause" });
     if (msg.action === "resume" && session && !session.usingFallback) toPlayer({ type: "resume" });
     if (msg.action === "retry" && lastRead && !session) {
-      if (lastRead.items) readSeq(lastRead.items, lastRead.run, lastRead.tabId); else readText(lastRead.text, lastRead.tabId);
+      if (lastRead.items) readSeq(lastRead.items, lastRead.run, lastRead.tabId, lastRead.pageLang);
+      else readText(lastRead.text, lastRead.tabId, { lang: lastRead.force, pageLang: lastRead.pageLang });
     }
-    if (msg.action === "read") readText(msg.text, msg.tabId ?? sender.tab?.id ?? null);
-    if (msg.action === "read-seq") readSeq(msg.items, msg.run, sender.tab?.id ?? null);   // a jump within the page being read
-    if (msg.action === "warm") settings().then((s) => toPlayer({ type: "warm", speed: s.speed }));
+    if (msg.action === "read") readText(msg.text, msg.tabId ?? sender.tab?.id ?? null, { lang: msg.lang, pageLang: msg.pageLang });
+    if (msg.action === "read-seq") readSeq(msg.items, msg.run, sender.tab?.id ?? null, msg.lang);   // a jump within the page being read
+    if (msg.action === "warm") settings().then(async (s) => toPlayer({ type: "warm", speed: s.speed, lang: msg.lang || await warmLang(s) }));
     if (msg.action === "open-pdf" && msg.url) {
       if (msg.newTab) chrome.tabs.create({ url: readerUrl(msg.url, msg.find) });
       else openReader({ id: msg.tabId ?? sender.tab?.id, url: msg.url }, msg.find);
@@ -242,16 +260,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!session) setBadge(msg.state === "playing" ? "speaking" : msg.state);
     return;
   }
-  if (msg?.type === "status") { sendResponse({ reading: !!session, state: session?.state ?? "idle", fallback: !!session?.usingFallback }); return; }
+  if (msg?.type === "status") { sendResponse({ reading: !!session, state: session?.state ?? "idle", fallback: !!session?.usingFallback, code: CODE_VERSION }); return; }
   if (msg?.type === "diag") {               // used by the automated tests
     Promise.resolve(toPlayer({ type: "stats" })).then((stats) => sendResponse({ log, stats, session, offscreen: USE_OFFSCREEN }));
     return true;
   }
 });
 
-// Speed changes need the model reloaded with new pacing: warm it in the background so the next read is quick.
-chrome.storage.onChanged.addListener((changes) => {
-  if (changes.speed) toPlayer({ type: "warm", speed: changes.speed.newValue });
+// Speed and language changes need the model reloaded: warm it in the background so the next read is quick.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync" && (changes.speed || changes.lang) && !session) settings().then(async (s) => toPlayer({ type: "warm", speed: s.speed, lang: await warmLang(s) }));
 });
 
 // Test hook (used by the Chrome end-to-end test; harmless otherwise).

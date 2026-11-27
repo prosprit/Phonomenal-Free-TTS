@@ -1,10 +1,11 @@
-:root { --bg:#fff; --ink:#16202a; --muted:#56616d; --line:#d3d9e0; --accent:#2f5d8a; --accent-ink:#fff; --soft:#eef3f8; --stop:#c63b3b; color-scheme:light dark; }
-@media (prefers-color-scheme: dark) { :root { --bg:#1b1d21; --ink:#eceef1; --muted:#a6adb6; --line:#3a3f47; --accent:#8bb8e6; --accent-ink:#0d1b29; --soft:#252b34; --stop:#e06464; } }
+:root { --bg:#fff; --ink:#16202a; --muted:#56616d; --line:#d3d9e0; --accent:#2f5d8a; --accent-ink:#fff; --soft:#eef3f8; --raised:#fff; --stop:#c63b3b; --hit:44px; color-scheme:light dark; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1b1d21; --ink:#eceef1; --muted:#a6adb6; --line:#3a3f47; --accent:#8bb8e6; --accent-ink:#0d1b29; --soft:#2a3039; --raised:#414955; --stop:#e06464; } }
 * { box-sizing:border-box; }
 [hidden] { display:none !important; }
 body { margin:0; font:15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
 b { font-weight:600; }
 h1 { font-weight:600; line-height:1.2; }
+.small { color:var(--muted); font-size:13px; margin:12px 0 0; }
 kbd { font:600 12px system-ui, sans-serif; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 5px; }
 
 .head { display:flex; gap:10px; align-items:center; }
@@ -17,30 +18,65 @@ h1 { font-size:18px; margin:0; letter-spacing:-.01em; }
 .btn.stop { background:var(--stop); color:#fff; border-color:var(--stop); }
 .btn:disabled { opacity:.5; cursor:default; }
 .btn.wide { width:100%; }
-.btn:focus-visible, .opt:focus-within { outline:3px solid var(--accent); outline-offset:2px; }
+.btn:focus-visible, .opt:has(input:focus-visible) { outline:3px solid var(--accent); outline-offset:2px; }
 
-/* popup */
-body.popup { width:320px; padding:14px; }
-fieldset { border:0; padding:0; margin:14px 0 0; min-width:0; }
-legend { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:0; margin-bottom:6px; }
-.vgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.col > div { display:flex; flex-direction:column; gap:4px; }
+/* popup: 420 px wide so voices sit three across and every target reaches about 44 px inside Chrome's 600 px cap.
+   Type roles: title 20, section 16, labels 15, help 14, group 13 (muted). */
+body.popup { width:420px; padding:12px 16px 12px; }
+.popup h1 { font-size:20px; }
+.quiet { margin-left:auto; min-height:var(--hit); padding:0 10px; margin-right:-10px; border:0; border-radius:8px; background:none; cursor:pointer;
+         font:600 15px system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--accent); }
+.quiet:hover { background:var(--soft); }
+.quiet:focus-visible { outline:3px solid var(--accent); outline-offset:-3px; }
+.how { margin:6px 0 0; font-size:15px; color:var(--muted); }
+.how b, .how kbd { color:var(--ink); }
+.how kbd { font-size:12.5px; }
+.card { margin-top:8px; padding:6px 6px 6px 14px; border-radius:12px; background:var(--soft); border:1px solid var(--accent);
+        display:flex; align-items:center; justify-content:space-between; gap:10px; font-weight:600; }
+.card .btn { white-space:nowrap; }
+
+.grp { margin-top:14px; }
+h2 { font-size:16px; font-weight:600; margin:0; }
 h3 { font-size:13px; font-weight:600; color:var(--muted); margin:0 0 4px 2px; }
-.opt { display:flex; gap:8px; align-items:center; min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:8px; cursor:pointer; font-weight:600; }
+.ghead { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.check { display:flex; align-items:center; gap:8px; min-height:var(--hit); padding:0 6px; margin-right:-6px; border-radius:8px;
+         font-size:15px; color:var(--ink); cursor:pointer; }
+.check:hover { background:var(--soft); }
+.check input { width:18px; height:18px; margin:0; accent-color:var(--accent); }
+.check:has(input:focus-visible) { outline:3px solid var(--accent); outline-offset:-3px; }
+.hint { margin:4px 2px 0; min-height:20px; font-size:14px; color:var(--muted); }
+.hint b { color:var(--ink); }
+
+/* segmented control: a recessed track; the chosen option is raised and ringed in the accent (3:1+ against the track) */
+.seg { display:flex; gap:2px; padding:2px; border-radius:12px; background:var(--soft); }
+.seg .opt { flex:1 1 auto; justify-content:center; min-height:40px; padding:0 8px; border:0; border-radius:10px; position:relative;
+            font-size:15px; white-space:nowrap; color:var(--muted); background:none; }
+.seg .opt input { position:absolute; opacity:0; pointer-events:none; }
+.seg .opt:hover { color:var(--ink); }
+.seg .opt:has(input:checked) { background:var(--raised); color:var(--ink); box-shadow:inset 0 0 0 2px var(--accent), 0 1px 2px rgb(0 0 0 / .12); }
+.seg .opt:has(input:focus-visible) { outline-offset:1px; }
+
+.vgroup { margin-top:8px; }
+.vgrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
+.opt { display:flex; gap:8px; align-items:center; min-height:40px; padding:0 8px; border:1px solid var(--line); border-radius:10px; cursor:pointer;
+       font-weight:600; min-width:0; }
+.opt span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .opt:hover { border-color:var(--accent); }
-.opt:has(input:checked) { border-color:var(--accent); background:var(--soft); }
+.vgrid .opt:has(input:checked) { border-color:var(--accent); background:var(--soft); box-shadow:inset 0 0 0 1px var(--accent); }
 .opt input { width:16px; height:16px; margin:0; accent-color:var(--accent); flex:none; }
-.vnote { margin:8px 2px 0; font-size:13px; color:var(--muted); min-height:18px; }
-.speeds { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
-.speeds .opt { justify-content:center; min-height:40px; }
-.dock { margin-top:14px; min-height:48px; }
-.now { display:flex; align-items:center; gap:6px; min-height:48px; padding:2px 2px 2px 12px; border-radius:12px; background:var(--soft); font-weight:600; }
-.now span { flex:1; }
-.now .btn { min-height:40px; padding:0 14px; }
-.small { color:var(--muted); font-size:12.5px; margin:10px 0 0; }
-.small a { color:var(--accent); font-weight:600; }
-.pdfcard { margin-top:12px; padding:8px 8px 8px 12px; border-radius:12px; background:var(--soft); border:1px solid var(--accent);
-           display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:600; }
+.vnote { margin:6px 2px 0; min-height:20px; font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.vnote b { color:var(--ink); }
+
+/* speed sits beside the Hear button: the sample plays at the speed next to it. Pause/Stop take the button's place. */
+.dock { display:flex; gap:8px; align-items:stretch; margin-top:12px; }
+.dock .seg { flex:none; }
+.dock .seg .opt { padding:0 12px; }
+.dock > .btn, .now { flex:1; min-height:var(--hit); }
+.now { display:flex; gap:6px; }
+.now .btn { flex:1; padding:0 8px; }
+.status { margin:6px 2px 0; font-size:14px; font-weight:600; color:var(--stop); }
+.status:empty, .status.quietly { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; margin:0; }
+::selection { background:color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* welcome page */
 body.welcome { padding:48px 24px; font-size:19px; line-height:1.55; }

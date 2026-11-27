@@ -9,37 +9,41 @@
   <header class="head">
     <img src="icons/icon48.png" alt="" width="28" height="28">
     <h1>Phonomenal</h1>
+    <button class="quiet" id="openPdf" type="button">Open a PDF…</button>
   </header>
-  <p class="how">Select text on a page, <b>right-click</b>, then choose <b>Read aloud</b>.</p>
-  <section class="pdfcard" id="pdfCard" hidden>
-    <span>This tab is a PDF</span>
+
+  <!-- One slot under the header: the update prompt, else the PDF prompt, else how to start reading. -->
+  <section class="card" id="updateCard" hidden>
+    <span>Phonomenal was updated.</span>
+    <button class="btn primary" id="finishUpdate" type="button">Restart it</button>
+  </section>
+  <section class="card" id="pdfCard" hidden>
+    <span>This tab is a PDF.</span>
     <button class="btn primary" id="readPdf" type="button">Read this PDF</button>
   </section>
+  <p class="how" id="how">Select text, <b>right-click</b>, choose <b>Read aloud</b>.<span id="shortcut" hidden></span></p>
 
-  <fieldset>
-    <legend>Voice</legend>
-    <div class="vgrid">
-      <div class="col" role="group" aria-labelledby="menH"><h3 id="menH">Men</h3><div id="men"></div></div>
-      <div class="col" role="group" aria-labelledby="womenH"><h3 id="womenH">Women</h3><div id="women"></div></div>
+  <section class="grp" aria-labelledby="voiceH">
+    <div class="ghead">
+      <h2 id="voiceH">Voice</h2>
+      <label class="check"><input type="checkbox" id="detect" aria-describedby="langNote"> Detect language</label>
     </div>
-    <p class="vnote" id="vnote" aria-live="polite"></p>
-  </fieldset>
-
-  <fieldset>
-    <legend>Speed</legend>
-    <div class="speeds" id="speeds"></div>
-  </fieldset>
+    <div class="seg" id="langs" role="radiogroup" aria-label="Voices for"></div>
+    <p class="hint" id="langNote"></p>
+    <div class="vgroup" role="group" aria-labelledby="menH"><h3 id="menH">Men</h3><div class="vgrid" id="men"></div></div>
+    <div class="vgroup" role="group" aria-labelledby="womenH"><h3 id="womenH">Women</h3><div class="vgrid" id="women"></div></div>
+    <p class="vnote" id="vnote"></p>
+  </section>
 
   <div class="dock">
-    <button class="btn primary wide" id="try" type="button">Hear this voice</button>
+    <div class="seg" id="speeds" role="radiogroup" aria-label="Speed"></div>
+    <button class="btn primary" id="try" type="button">Hear this voice</button>
     <div class="now" id="now" hidden>
-      <span id="nowLabel" aria-live="polite">Reading aloud</span>
-      <button class="btn" id="pause" type="button">Pause</button>
-      <button class="btn stop" id="stop" type="button">Stop</button>
+      <button class="btn primary" id="pause" type="button">Pause</button>
+      <button class="btn" id="stop" type="button">Stop</button>
     </div>
   </div>
-  <p class="small" id="shortcut" hidden></p>
-  <p class="small"><a href="#" id="openPdf">Open a PDF from your computer…</a></p>
+  <p class="status" id="nowLabel" aria-live="polite"></p>
   <script type="module" src="popup.js"></script>
 </body>
 </html>

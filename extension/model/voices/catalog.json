@@ -1,62 +1,290 @@
 {
- "Everly": {
-  "voice_id": "vjFyp2BcCyTlUmYb",
-  "gender": "female",
-  "locale": "en-us",
-  "description": "Rounded, soft-edged tone with gentle lift at the end of phrases and an easy, relaxed delivery."
- },
- "Harper": {
-  "voice_id": "4SZHfMpw-p46Ywgs",
-  "gender": "female",
-  "locale": "en-us",
-  "description": "Modern, confident and friendly voice with a standard American accent."
- },
- "Hadley": {
-  "voice_id": "bXwrkHhURL1VFJdG",
-  "gender": "female",
-  "locale": "en-us",
-  "description": "Settled, even-toned and genuinely kind, with crisp consonants that hold up over a handset."
- },
- "Delia": {
-  "voice_id": "nGzMHMPAWGaJFHOo",
-  "gender": "female",
-  "locale": "en-us",
-  "description": "Low, grounded and quick to the point, with a sincerity that keeps an apology honest."
- },
- "Trevor": {
-  "voice_id": "0zLApsZfVLLNaEGl",
-  "gender": "male",
-  "locale": "en-us",
-  "description": "Buoyant energy over a resonant mid-low core, phrases landing softly and consonants cutting through a handset."
- },
  "Preston": {
+  "name": "Preston",
   "voice_id": "qIxlZ7Ei8KvWlyQH",
+  "language": "en",
   "gender": "male",
   "locale": "en-us",
   "description": "Trim, focused delivery with clean edges on every consonant and a steady, low-set core that carries through phone bandwidth."
  },
+ "Trevor": {
+  "name": "Trevor",
+  "voice_id": "0zLApsZfVLLNaEGl",
+  "language": "en",
+  "gender": "male",
+  "locale": "en-us",
+  "description": "Buoyant energy over a resonant mid-low core, phrases landing softly and consonants cutting through a handset."
+ },
  "Hugh": {
+  "name": "Hugh",
   "voice_id": "YyKcxPG7iIgS3jsK",
+  "language": "en",
   "gender": "male",
   "locale": "en-gb",
   "description": "Soft and close, airy in texture, with lively pitch movement and an attentive, sincere delivery."
  },
- "Edwin": {
-  "voice_id": "zUCxzrOrugTSis03",
-  "gender": "male",
-  "locale": "en-gb",
-  "description": "Efficient and firm, sincere in attention, with tidy articulation that holds up at phone bandwidth."
- },
  "Spencer": {
+  "name": "Spencer",
   "voice_id": "JOW0vchyswkQUMDS",
+  "language": "en",
   "gender": "male",
   "locale": "en-gb",
   "description": "Light and airy, sitting a touch higher, with crisp consonants and a slow, patient delivery."
  },
+ "Edwin": {
+  "name": "Edwin",
+  "voice_id": "zUCxzrOrugTSis03",
+  "language": "en",
+  "gender": "male",
+  "locale": "en-gb",
+  "description": "Efficient and firm, sincere in attention, with tidy articulation that holds up at phone bandwidth."
+ },
+ "Hadley": {
+  "name": "Hadley",
+  "voice_id": "bXwrkHhURL1VFJdG",
+  "language": "en",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Settled, even-toned and genuinely kind, with crisp consonants that hold up over a handset."
+ },
+ "Everly": {
+  "name": "Everly",
+  "voice_id": "vjFyp2BcCyTlUmYb",
+  "language": "en",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Rounded, soft-edged tone with gentle lift at the end of phrases and an easy, relaxed delivery."
+ },
+ "Delia": {
+  "name": "Delia",
+  "voice_id": "nGzMHMPAWGaJFHOo",
+  "language": "en",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Low, grounded and quick to the point, with a sincerity that keeps an apology honest."
+ },
  "Bryony": {
+  "name": "Bryony",
   "voice_id": "gfP44RlHwr2kEwk7",
+  "language": "en",
   "gender": "female",
   "locale": "en-gb",
   "description": "Full, rich mid-range tones, softly relaxed and spoken close to the mic, moving briskly with light pitch play."
+ },
+ "Harper": {
+  "name": "Harper",
+  "voice_id": "4SZHfMpw-p46Ywgs",
+  "language": "en",
+  "gender": "female",
+  "locale": "en-us",
+  "description": "Modern, confident and friendly voice with a standard American accent."
+ },
+ "Noa": {
+  "name": "Noa",
+  "voice_id": "b6FvJAiokjdqIti4",
+  "language": "es",
+  "gender": "female",
+  "locale": "es-es",
+  "description": "A glossy, confident young Castilian Spanish voice with fast, girly charm and warmth, a bubbly assistant that makes every chat sparkle."
+ },
+ "Lucia-Sol": {
+  "name": "Lucía-Sol",
+  "voice_id": "3p0eIGbkmny71GlA",
+  "language": "es",
+  "gender": "female",
+  "locale": "es-es",
+  "description": "A bouncy, chipper young Castilian Spanish voice with a cute upward lilt, bringing playful energy to friendly reception and support."
+ },
+ "Rebeca": {
+  "name": "Rebeca",
+  "voice_id": "Sx8m6WdXBG06zwZT",
+  "language": "es",
+  "gender": "female",
+  "locale": "es-mx",
+  "description": "Fuller and grounded in the low end, with hard consonant edges and a decisive punch saved for the brand name."
+ },
+ "Regina": {
+  "name": "Regina",
+  "voice_id": "s58clrg2fe0MO7Y-",
+  "language": "es",
+  "gender": "female",
+  "locale": "es-mx",
+  "description": "A confident, upbeat Mexican Spanish adult voice with the natural assurance of a closer. Ideal for proactive assistants and sales-led customer interactions."
+ },
+ "Marcos": {
+  "name": "Marcos",
+  "voice_id": "jvPx8j8zLGQ3utZz",
+  "language": "es",
+  "gender": "male",
+  "locale": "es-es",
+  "description": "A confident, upbeat Peninsular Spanish adult voice with infectious energy. Perfect for proactive assistants and motivating customer success calls."
+ },
+ "Borja": {
+  "name": "Borja",
+  "voice_id": "tIjCgP8v3RY8UpgM",
+  "language": "es",
+  "gender": "male",
+  "locale": "es-es",
+  "description": "Resonant and punchy, driving a rhythmic read that cuts over a loud music bed and lands squarely on the brand name."
+ },
+ "Lalo": {
+  "name": "Lalo",
+  "voice_id": "F05gqkzX7WhKVpSL",
+  "language": "es",
+  "gender": "male",
+  "locale": "es-mx",
+  "description": "Fuller and rounder low end, concise phrasing and a decisive drop on the last line, with range to pull back for one clause and push again."
+ },
+ "Aldo": {
+  "name": "Aldo",
+  "voice_id": "ax7dW1XB0eiMfHgO",
+  "language": "es",
+  "gender": "male",
+  "locale": "es-mx",
+  "description": "Forward, close-miked energy with crisp consonant attack and pitch that climbs and drops across a line."
+ },
+ "Noemie": {
+  "name": "Noémie",
+  "voice_id": "FXxJ9mANRq6BCTX5",
+  "language": "fr",
+  "gender": "female",
+  "locale": "fr-fr",
+  "description": "A young Parisian voice, warm and expressive with a quick playful pace and delicate high notes, a care specialist who stays bright and witty."
+ },
+ "Coralie": {
+  "name": "Coralie",
+  "voice_id": "ZeSg853xFACESHHI",
+  "language": "fr",
+  "gender": "female",
+  "locale": "fr-fr",
+  "description": "A young Parisian voice, sweet and airy with fast, giggly girly charm, a bubbly assistant who makes every interaction feel light."
+ },
+ "Tiphaine": {
+  "name": "Tiphaine",
+  "voice_id": "0fvH6XAKvA748v2v",
+  "language": "fr",
+  "gender": "female",
+  "locale": "fr-fr",
+  "description": "Rounded, low-set tone with even phrasing and consonants that stay crisp through a handset."
+ },
+ "Augustin": {
+  "name": "Augustin",
+  "voice_id": "Tek4tJXiX6_yvXq7",
+  "language": "fr",
+  "gender": "male",
+  "locale": "fr-fr",
+  "description": "A curious, animated French adult voice that lights up when sharing an unexpected fact. Perfect for geeky explainers and trivia-driven dialogue."
+ },
+ "Arnaud": {
+  "name": "Arnaud",
+  "voice_id": "aXMVwiUhITMrwPzd",
+  "language": "fr",
+  "gender": "male",
+  "locale": "fr-fr",
+  "description": "Low and firm, quick to the point, consonants holding their shape at phone bandwidth."
+ },
+ "Jules": {
+  "name": "Jules",
+  "voice_id": "YKeBw3OV1RgpdhLh",
+  "language": "fr",
+  "gender": "male",
+  "locale": "fr-fr",
+  "description": "A lively, expressive French adult voice that lights up around topics it loves. Great for animated recommendations and high-energy dialogue."
+ },
+ "Nele": {
+  "name": "Nele",
+  "voice_id": "2A2fFf8SkDEJ8nzx",
+  "language": "de",
+  "gender": "female",
+  "locale": "de-de",
+  "description": "Rounded, open tone with gentle lift at the ends of phrases and an easy, flowing rhythm."
+ },
+ "Jette": {
+  "name": "Jette",
+  "voice_id": "4Mn9VfG2wsLLEzi5",
+  "language": "de",
+  "gender": "female",
+  "locale": "de-de",
+  "description": "An upbeat young German voice with a light girlish tone and warm bounce, a chipper assistant who keeps things moving with a smile."
+ },
+ "Annika": {
+  "name": "Annika",
+  "voice_id": "p6Uutkyi3j2iNAUu",
+  "language": "de",
+  "gender": "female",
+  "locale": "de-de",
+  "description": "A sparky, attentive German adult voice that gets to the point with a smile. Ideal for fast, efficient customer support and helpful voice assistants."
+ },
+ "Anton": {
+  "name": "Anton",
+  "voice_id": "3ZKKapPOvuWFcw9f",
+  "language": "de",
+  "gender": "male",
+  "locale": "de-de",
+  "description": "A vibrant, engaging German adult voice that makes every explanation feel personal. Built for product guides and walk-through assistants."
+ },
+ "Mirko": {
+  "name": "Mirko",
+  "voice_id": "Xn9xDzqSSr4xGTNg",
+  "language": "de",
+  "gender": "male",
+  "locale": "de-de",
+  "description": "Punchy and close-miked in feel, with hard edges on the consonants and a decisive drop on the final line."
+ },
+ "Mats": {
+  "name": "Mats",
+  "voice_id": "Kf5m22mROozoMWj3",
+  "language": "de",
+  "gender": "male",
+  "locale": "de-de",
+  "description": "A sparky, attentive German adult voice that gets to the point with a smile. Ideal for fast, efficient customer support and helpful voice assistants."
+ },
+ "Manuela-Lu": {
+  "name": "Manuela-Lu",
+  "voice_id": "KgC2Nqnjj48NUiyV",
+  "language": "pt",
+  "gender": "female",
+  "locale": "pt-br",
+  "description": "A bright, sweet, chirpy young voice with breathless excitement and a constant smile, a warm receptionist who greets everyone like a friend."
+ },
+ "Isadora": {
+  "name": "Isadora",
+  "voice_id": "CtNvKUUMrx1h56ih",
+  "language": "pt",
+  "gender": "female",
+  "locale": "pt-br",
+  "description": "An upbeat young voice with a light girlish tone and warm bounce, quick and to the point, ideal for efficient, caring customer service."
+ },
+ "Debora": {
+  "name": "Débora",
+  "voice_id": "K8mj96kYHMy8q3Hb",
+  "language": "pt",
+  "gender": "female",
+  "locale": "pt-br",
+  "description": "Low-set and resonant, with firm even phrasing and short decisive sentences."
+ },
+ "Davi": {
+  "name": "Davi",
+  "voice_id": "NuUr_x5V90hSHzCJ",
+  "language": "pt",
+  "gender": "male",
+  "locale": "pt-br",
+  "description": "A confident, upbeat Brazilian Portuguese adult voice with infectious energy. Perfect for proactive assistants and motivating customer success calls."
+ },
+ "Igor": {
+  "name": "Igor",
+  "voice_id": "l7520SIXi14iEamd",
+  "language": "pt",
+  "gender": "male",
+  "locale": "pt-br",
+  "description": "Lifted and lively, pitch moving across a phrase, articulation quick and tidy."
+ },
+ "Kaua": {
+  "name": "Kauã",
+  "voice_id": "6HftnVU1XqVBJS8t",
+  "language": "pt",
+  "gender": "male",
+  "locale": "pt-br",
+  "description": "Sparky and close, with clean attack, brisk rhythm and a decisive push on the final clause that cuts over a loud music bed."
  }
 }
